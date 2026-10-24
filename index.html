@@ -171,6 +171,18 @@
                 <label>Username (Premium Only)</label>
                 <input type="text" id="input-username" placeholder="Enter username...">
             </div>
+            
+            <!-- NEW FIELDS -->
+            <div class="form-group">
+                <label>Most Played Game (Roblox)</label>
+                <input type="text" id="input-game" placeholder="e.g., Rivals" value="Rivals">
+            </div>
+            <div class="form-group">
+                <label>Total Games Played (For Aura Calculation)</label>
+                <input type="number" id="input-played" placeholder="e.g., 1500" value="1000">
+            </div>
+            <!-- END NEW FIELDS -->
+
             <p id="validation-error" style="color: #ff5252; font-size: 12px; display: none;">Error!</p>
             
             <div class="modal-actions" id="modal-actions">
@@ -277,6 +289,8 @@
             document.getElementById('create-modal').classList.add('active');
             document.getElementById('validation-error').style.display = 'none';
             document.getElementById('input-username').value = "";
+            document.getElementById('input-game').value = "Rivals";
+            document.getElementById('input-played').value = "1000";
             window.realData = null;
             window.generatedCardData = null;
         });
@@ -306,9 +320,16 @@
 
             try {
                 if (currentPlatform === 'roblox') {
+                    const manualGame = document.getElementById('input-game').value.trim() || "Rivals";
+                    const manualPlayed = document.getElementById('input-played').value.trim() || "0";
+
                     const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/roblox_stats', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: username })
+                        body: JSON.stringify({ 
+                            username: username,
+                            most_played_game: manualGame,
+                            games_played: manualPlayed
+                        })
                     });
                     const data = await res.json();
                     if (data.success) { isValid = true; window.realData = data; } 
@@ -360,7 +381,7 @@
                     stat1 = d.games_played || "0";
                     stat2 = d.games_won || "0";
                     stat3 = d.aura_streak || "0x";
-                    stat4 = d.most_played_game || "Rivals"; // Default fallback
+                    stat4 = d.most_played_game || "Rivals"; 
                     stat5 = d.friends !== undefined ? d.friends : "0";
                     
                     label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS";
@@ -411,7 +432,7 @@
                 }
             }
 
-            // Stats Box (Bigger to fit all stats)
+            // Stats Box
             ctx.fillStyle = '#191920'; ctx.fillRect(50, 380, 800, 180);
             ctx.strokeStyle = '#32323c'; ctx.strokeRect(50, 380, 800, 180);
 
