@@ -37,7 +37,11 @@
         .platform-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
         .platform-card { background: var(--panel); padding: 30px; border-radius: 16px; width: 200px; text-align: center; cursor: pointer; border: 2px solid #333; transition: 0.3s; }
         .platform-card:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .platform-icon { font-size: 50px; margin-bottom: 10px; }
+        .platform-icon { font-size: 50px; margin-bottom: 10px; line-height: 1; }
+        
+        /* 🎨 REAL PLATFORM LOGOS */
+        .platform-logo { width: 85px; height: 85px; margin-bottom: 15px; object-fit: contain; display: inline-block; vertical-align: middle; filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.5)); }
+        
         .platform-card h3 { margin: 0; font-family: 'Montserrat', sans-serif; }
 
         .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
@@ -87,12 +91,23 @@
         .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; transition: 0.3s; }
         .close-viewer:hover { color: #ff5252; transform: rotate(90deg); }
         
+        /* MUSIC TOGGLE BUTTON */
+        .music-toggle {
+            position: absolute; top: 30px; left: 40px;
+            background: #ff5252; color: white;
+            border: none; padding: 12px 22px; border-radius: 8px;
+            font-size: 15px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; z-index: 10;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .music-toggle:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
         #upload-success { color: var(--green); font-size: 16px; margin-top: 15px; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <audio id="funkPlayer" loop></audio>
+    <audio id="funkPlayer" loop preload="auto"></audio>
 
     <!-- SCREEN 1: LOGIN -->
     <div id="login-screen" class="screen active">
@@ -131,16 +146,39 @@
             <h2 style="text-align: center; font-family: 'Montserrat';">Select Your Platform</h2>
             <div class="platform-grid">
                 <div class="platform-card" onclick="selectPlatform('minecraft')">
-                    <div class="platform-icon">⛏️</div><h3>Minecraft Java</h3>
+                    <!-- ⛏️ Java 3D Grass Block -->
+                    <img class="platform-logo" alt="Minecraft Java"
+                         src="https://minecraft.wiki/images/Grass_Block_JE7_BE6.png"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="platform-icon" style="display:none;">⛏️</div>
+                    <h3>Minecraft Java</h3>
                 </div>
+                
                 <div class="platform-card" onclick="selectPlatform('bedrock')">
-                    <div class="platform-icon">🪨</div><h3>Minecraft Bedrock</h3>
+                    <!-- 🪨 Bedrock 2D Pixel Grass Block -->
+                    <img class="platform-logo" alt="Minecraft Bedrock"
+                         src="https://minecraft.wiki/images/Grass_Block_JE4_BE3.png"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="platform-icon" style="display:none;">🪨</div>
+                    <h3>Minecraft Bedrock</h3>
                 </div>
+                
                 <div class="platform-card" onclick="selectPlatform('roblox')">
-                    <div class="platform-icon">🟥</div><h3>Roblox</h3>
+                    <!-- 🟥 Official Roblox App Icon -->
+                    <img class="platform-logo" alt="Roblox"
+                         src="https://upload.wikimedia.org/wikipedia/commons/6/63/Roblox_icon_2022.png"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="platform-icon" style="display:none;">🟥</div>
+                    <h3>Roblox</h3>
                 </div>
+                
                 <div class="platform-card" onclick="selectPlatform('youtube')">
-                    <div class="platform-icon" style="color: var(--yt-red);">▶️</div><h3>YouTube</h3>
+                    <!-- ▶️ Official YouTube Icon -->
+                    <img class="platform-logo" alt="YouTube"
+                         src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="platform-icon" style="display:none;">▶️</div>
+                    <h3>YouTube</h3>
                 </div>
             </div>
         </div>
@@ -198,6 +236,7 @@
     <!-- BIG LANDSCAPE VIEWER OVERLAY -->
     <div id="card-viewer">
         <button class="close-viewer" onclick="closeViewer()">✖</button>
+        <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">🔇 Click to Play Music</button>
         <img id="large-preview">
         <div class="viewer-actions" id="viewer-actions" style="display: none;">
             <button class="btn-download" id="downloadBtn">📥 Download PNG</button>
@@ -229,18 +268,48 @@
         window.generatedCardData = null;
 
         const funkPlayer = document.getElementById('funkPlayer');
-        const FUNK_LOW = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3';
-        const FUNK_MID = 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1b19.mp3';
-        const FUNK_HIGH = 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_5c9c7c9b9c.mp3';
+        
+        // 🎵 NEW RELIABLE AUDIO LINKS (Mixkit - 100% free, no hotlink blocks)
+        const FUNK_LOW = 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3';
+        const FUNK_MID = 'https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3';
+        const FUNK_HIGH = 'https://assets.mixkit.co/music/preview/mixkit-dj-bass-120.mp3';
 
-        function loadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "Anonymous";
-                img.onload = () => resolve(img);
-                img.onerror = () => resolve(null); 
-                img.src = url;
-            });
+        function updateMusicUI(isPlaying) {
+            const btn = document.getElementById('musicToggle');
+            if (!btn) return;
+            if (isPlaying) {
+                btn.innerText = '🔊 Music On';
+                btn.style.background = 'var(--green)';
+            } else {
+                btn.innerText = '🔇 Click to Play Music';
+                btn.style.background = '#ff5252';
+            }
+        }
+
+        async function tryAutoplayMusic() {
+            try {
+                funkPlayer.volume = 0.5;
+                await funkPlayer.play();
+                updateMusicUI(true);
+            } catch (err) {
+                console.log('Autoplay blocked by browser. User needs to click.');
+                updateMusicUI(false);
+            }
+        }
+
+        function toggleMusic() {
+            if (funkPlayer.paused) {
+                funkPlayer.volume = 0.5;
+                funkPlayer.play()
+                    .then(() => updateMusicUI(true))
+                    .catch((e) => {
+                        console.log('Play failed:', e);
+                        updateMusicUI(false);
+                    });
+            } else {
+                funkPlayer.pause();
+                updateMusicUI(false);
+            }
         }
 
         function showScreen(screenId) {
@@ -256,7 +325,6 @@
             document.getElementById('platform-title').innerText = titleMap[platform];
             document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`;
             
-            // Show Roblox specific inputs only if Roblox is selected
             if (platform === 'roblox') {
                 document.getElementById('roblox-inputs').style.display = 'block';
             } else {
@@ -309,6 +377,8 @@
         function closeModal() { document.getElementById('create-modal').classList.remove('active'); }
         
         function closeViewer() { 
+            funkPlayer.pause();
+            updateMusicUI(false);
             document.getElementById('card-viewer').classList.remove('active');
             document.getElementById('large-preview').style.display = 'none';
             document.getElementById('viewer-actions').style.display = 'none';
@@ -401,7 +471,6 @@
                     stat5 = d.friends !== undefined ? d.friends : "0";
                     label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS";
                 } else if (currentPlatform === 'youtube') {
-                    // 🐷 Technoblade gets INFINITY aura. Others get normal number.
                     stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level);
                     stat2 = d.subs.toLocaleString();
                     stat3 = d.views.toLocaleString();
@@ -422,8 +491,8 @@
                 else { funkPlayer.src = FUNK_LOW; }
             }
 
-            funkPlayer.volume = 0.5; 
-            funkPlayer.play().catch(e => console.log("Audio blocked"));
+            funkPlayer.load();
+            tryAutoplayMusic();
 
             const canvas = document.getElementById('card-canvas');
             canvas.width = 900; canvas.height = 600;
@@ -490,7 +559,6 @@
             document.getElementById('card-viewer').classList.add('active');
             document.getElementById('viewer-actions').style.display = 'flex';
 
-            // 🐷 For Technoblade's "Lvl ∞", fall back to real aura_level so leaderboard still sorts correctly
             window.generatedCardData = {
                 image: largePreview.src,
                 platform: currentPlatform,
@@ -498,6 +566,16 @@
                 level: parseInt(stat1.replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0,
                 bio: bio
             };
+        }
+
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null); 
+                img.src = url;
+            });
         }
 
         document.getElementById('downloadBtn').addEventListener('click', () => {
@@ -516,7 +594,6 @@
             btn.disabled = true;
 
             try {
-                // Unique ID to prevent duplicates
                 const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`;
 
                 await db.collection('auracards').doc(uniqueDocId).set({
@@ -556,7 +633,6 @@
                   snap.forEach((doc) => {
                       const data = doc.data();
                       const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
-                      // 🐷 YouTube Technoblade (9999 aura) shows ∞ instead of Lvl 9999
                       const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
                       list.innerHTML += `<div class="player-row"><span>#${rank} ${data.username}</span> <span style="color: ${color};">${winLabel}</span></div>`;
                       rank++;
