@@ -401,7 +401,8 @@
                     stat5 = d.friends !== undefined ? d.friends : "0";
                     label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS";
                 } else if (currentPlatform === 'youtube') {
-                    stat1 = "Lvl " + d.aura_level;
+                    // 🐷 Technoblade gets INFINITY aura. Others get normal number.
+                    stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level);
                     stat2 = d.subs.toLocaleString();
                     stat3 = d.views.toLocaleString();
                     stat4 = "YouTube";
@@ -489,7 +490,14 @@
             document.getElementById('card-viewer').classList.add('active');
             document.getElementById('viewer-actions').style.display = 'flex';
 
-            window.generatedCardData = { image: largePreview.src, platform: currentPlatform, username: validatedUsername, level: parseInt(stat1.replace("Lvl ", "")) || 0, bio: bio };
+            // 🐷 For Technoblade's "Lvl ∞", fall back to real aura_level so leaderboard still sorts correctly
+            window.generatedCardData = {
+                image: largePreview.src,
+                platform: currentPlatform,
+                username: validatedUsername,
+                level: parseInt(stat1.replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0,
+                bio: bio
+            };
         }
 
         document.getElementById('downloadBtn').addEventListener('click', () => {
@@ -548,7 +556,9 @@
                   snap.forEach((doc) => {
                       const data = doc.data();
                       const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
-                      list.innerHTML += `<div class="player-row"><span>#${rank} ${data.username}</span> <span style="color: ${color};">Lvl ${data.wins}</span></div>`;
+                      // 🐷 YouTube Technoblade (9999 aura) shows ∞ instead of Lvl 9999
+                      const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
+                      list.innerHTML += `<div class="player-row"><span>#${rank} ${data.username}</span> <span style="color: ${color};">${winLabel}</span></div>`;
                       rank++;
                   });
               }).catch((err) => { list.innerHTML = `<p>Database index needed.</p>`; });
