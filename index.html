@@ -145,14 +145,28 @@
             <h2 style="text-align: center; font-family: 'Montserrat';">Select Your Platform</h2>
             <div class="platform-grid">
                 
-                <!-- ⛏️ Java 3D Grass Block (High-quality SVG from Devicon) -->
+                <!-- ⛏️ Java 3D Grass Block (Pure SVG - 100% Reliable) -->
                 <div class="platform-card" onclick="selectPlatform('minecraft')">
-                    <img class="platform-logo" alt="Minecraft Java" 
-                         src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/minecraft/minecraft-original.svg?v=4">
+                    <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="50,10 90,30 50,50 10,30" fill="#7CBD56"/> <!-- Top -->
+                        <polygon points="10,30 50,50 50,90 10,70" fill="#8B5A2B"/> <!-- Left -->
+                        <polygon points="50,50 90,30 90,70 50,90" fill="#5c402c"/> <!-- Right -->
+                        
+                        <!-- Dirt Details -->
+                        <polygon points="20,40 30,45 30,55 20,50" fill="#705038"/>
+                        <polygon points="60,55 75,47 75,60 60,68" fill="#5c402c"/>
+                        <polygon points="15,60 25,65 25,75 15,70" fill="#705038"/>
+                        
+                        <!-- Grass Drips -->
+                        <polygon points="10,30 20,35 20,40 15,45 10,40" fill="#7CBD56"/>
+                        <polygon points="25,38 35,43 35,48 30,53 25,48" fill="#7CBD56"/>
+                        <polygon points="50,50 65,42 65,47 55,55 50,52" fill="#7CBD56"/>
+                        <polygon points="75,38 85,33 85,38 80,43 75,40" fill="#7CBD56"/>
+                    </svg>
                     <h3>Minecraft Java</h3>
                 </div>
                 
-                <!-- 🪨 Bedrock 2D Pixel Grass Block (SVG) -->
+                <!-- 🪨 Bedrock 2D Pixel Grass Block (Pure SVG - 100% Reliable) -->
                 <div class="platform-card" onclick="selectPlatform('bedrock')">
                     <svg class="platform-logo" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
                         <rect width="16" height="16" fill="#866043" />
@@ -169,20 +183,20 @@
                     <h3>Minecraft Bedrock</h3>
                 </div>
                 
-                <!-- 🟥 Official Roblox Icon (SVG) -->
+                <!-- 🟥 Official Roblox App Icon (Pure SVG - 100% Reliable) -->
                 <div class="platform-card" onclick="selectPlatform('roblox')">
                     <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <!-- Official Blue Background -->
                         <rect width="100" height="100" fill="#0074FF"/>
-                        <!-- Perfect Tilted Square -->
+                        <!-- Perfect Tilted White Square -->
                         <rect x="32.3" y="32.3" width="35.4" height="35.4" fill="#FFFFFF" transform="rotate(15 50 50)"/>
-                        <!-- Inner Cutout -->
+                        <!-- Inner Blue Cutout -->
                         <rect x="39.5" y="39.5" width="21" height="21" fill="#0074FF" transform="rotate(15 50 50)"/>
                     </svg>
                     <h3>Roblox</h3>
                 </div>
                 
-                <!-- ▶️ Official YouTube Icon (SVG) -->
+                <!-- ▶️ Official YouTube Icon (Pure SVG - 100% Reliable) -->
                 <div class="platform-card" onclick="selectPlatform('youtube')">
                     <svg class="platform-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
@@ -190,6 +204,7 @@
                     </svg>
                     <h3>YouTube</h3>
                 </div>
+                
             </div>
         </div>
     </div>
