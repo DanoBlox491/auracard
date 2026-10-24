@@ -8,7 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; }
+        :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; --yt-red: #ff0000; --green: #4CAF50; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
         
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
@@ -45,6 +45,7 @@
         .player-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #333; }
         .player-row:last-child { border-bottom: none; }
 
+        /* Creation Modal */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--panel); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; border-top: 5px solid var(--accent); }
@@ -56,8 +57,34 @@
         .modal-actions button { flex: 1; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
         .btn-cancel { background: #333; color: white; }
         .btn-submit { background: var(--accent); color: #000; }
+
+        /* BIG LANDSCAPE VIEWER OVERLAY */
+        #card-viewer {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 8, 0.95); z-index: 200;
+            flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        #card-viewer.active { display: flex; }
         
-        #canvas-preview { width: 100%; border-radius: 8px; margin: 15px 0; display: none; }
+        #large-preview { 
+            max-width: 95vw; max-height: 75vh; border-radius: 12px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: none;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .viewer-actions { display: flex; gap: 20px; margin-top: 30px; }
+        .viewer-actions button { padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        .btn-download { background: var(--green); color: white; }
+        .btn-download:hover { background: #388e3c; transform: scale(1.05); }
+        .btn-upload { background: var(--accent); color: #000; }
+        .btn-upload:hover { background: #00b8cc; transform: scale(1.05); }
+        
+        .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; transition: 0.3s; }
+        .close-viewer:hover { color: #ff5252; transform: rotate(90deg); }
+        
+        #upload-success { color: var(--green); font-size: 16px; margin-top: 15px; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -101,16 +128,13 @@
             <h2 style="text-align: center; font-family: 'Montserrat';">Select Your Platform</h2>
             <div class="platform-grid">
                 <div class="platform-card" onclick="selectPlatform('minecraft')">
-                    <div class="platform-icon">⛏️</div>
-                    <h3>Minecraft Java</h3>
+                    <div class="platform-icon">⛏️</div><h3>Minecraft Java</h3>
                 </div>
                 <div class="platform-card" onclick="selectPlatform('bedrock')">
-                    <div class="platform-icon">🪨</div>
-                    <h3>Minecraft Bedrock</h3>
+                    <div class="platform-icon">🪨</div><h3>Minecraft Bedrock</h3>
                 </div>
                 <div class="platform-card" onclick="selectPlatform('roblox')">
-                    <div class="platform-icon">🟥</div>
-                    <h3>Roblox</h3>
+                    <div class="platform-icon">🟥</div><h3>Roblox</h3>
                 </div>
             </div>
         </div>
@@ -136,7 +160,7 @@
         </div>
     </div>
 
-    <!-- MODAL -->
+    <!-- CREATION MODAL -->
     <div class="modal-overlay" id="create-modal">
         <div class="modal">
             <h2>Create AuraCard</h2>
@@ -144,21 +168,25 @@
                 <label>Username (Premium Only)</label>
                 <input type="text" id="input-username" placeholder="Enter username...">
             </div>
-            <p id="validation-error" style="color: #ff5252; font-size: 12px; display: none;">Invalid or cracked username!</p>
+            <p id="validation-error" style="color: #ff5252; font-size: 12px; display: none;">Error!</p>
             
             <div class="modal-actions" id="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn-submit" id="validateBtn">Validate</button>
             </div>
-
-            <div id="card-details" style="display: none; margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
-                <p style="color: var(--accent); font-size: 14px; margin-bottom: 15px; text-align: center;">✨ Aura Data Fetched Successfully!</p>
-                <button class="btn-submit" style="width: 100%; padding: 15px;" onclick="generateCard()">Generate AuraCard!</button>
-            </div>
-
-            <canvas id="card-canvas" style="display: none;"></canvas>
-            <img id="canvas-preview">
         </div>
+    </div>
+
+    <!-- BIG LANDSCAPE VIEWER OVERLAY -->
+    <div id="card-viewer">
+        <button class="close-viewer" onclick="closeViewer()">✖</button>
+        <img id="large-preview">
+        <div class="viewer-actions" id="viewer-actions" style="display: none;">
+            <button class="btn-download" id="downloadBtn">📥 Download PNG</button>
+            <button class="btn-upload" id="uploadBtn">🚀 Upload to AuraCard</button>
+        </div>
+        <p id="upload-success">✅ Successfully uploaded to the gallery!</p>
+        <canvas id="card-canvas" style="display: none;"></canvas>
     </div>
 
     <script>
@@ -179,7 +207,8 @@
         let currentPlatform = "";
         let currentUser = null;
         let validatedUsername = "";
-        window.realRobloxData = null; 
+        window.realData = null; 
+        window.generatedCardData = null;
 
         const funkPlayer = document.getElementById('funkPlayer');
         const FUNK_LOW = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3';
@@ -201,9 +230,7 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        function goToDashboard() {
-            showScreen('dashboard-screen');
-        }
+        function goToDashboard() { showScreen('dashboard-screen'); }
 
         function selectPlatform(platform) {
             currentPlatform = platform;
@@ -231,9 +258,7 @@
                 document.getElementById('user-name').innerText = currentUser.displayName || "Gamer";
                 document.getElementById('user-avatar').src = currentUser.photoURL || "https://via.placeholder.com/35";
                 showScreen('dashboard-screen');
-            } catch (error) {
-                alert(`Login failed (${providerName}): ` + error.message);
-            }
+            } catch (error) { alert(`Login failed: ` + error.message); }
         }
 
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
@@ -242,22 +267,28 @@
         document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            auth.signOut();
-            currentUser = null;
-            showScreen('login-screen');
+            auth.signOut(); currentUser = null; showScreen('login-screen');
         });
 
         document.getElementById('openCreateModal').addEventListener('click', () => {
             document.getElementById('create-modal').classList.add('active');
-            document.getElementById('card-details').style.display = 'none';
-            document.getElementById('modal-actions').style.display = 'flex';
             document.getElementById('validation-error').style.display = 'none';
             document.getElementById('input-username').value = "";
-            document.getElementById('canvas-preview').style.display = 'none';
-            window.realRobloxData = null;
+            window.realData = null;
+            window.generatedCardData = null;
         });
 
         function closeModal() { document.getElementById('create-modal').classList.remove('active'); }
+        
+        function closeViewer() { 
+            document.getElementById('card-viewer').classList.remove('active');
+            document.getElementById('large-preview').style.display = 'none';
+            document.getElementById('viewer-actions').style.display = 'none';
+            document.getElementById('upload-success').style.display = 'none';
+            document.getElementById('downloadBtn').innerText = "📥 Download PNG";
+            document.getElementById('uploadBtn').innerText = "🚀 Upload to AuraCard";
+            document.getElementById('uploadBtn').disabled = false;
+        }
 
         document.getElementById('validateBtn').addEventListener('click', async () => {
             const username = document.getElementById('input-username').value.trim();
@@ -265,7 +296,7 @@
             
             const btn = document.getElementById('validateBtn');
             const err = document.getElementById('validation-error');
-            btn.innerText = "Fetching Real Data...";
+            btn.innerText = "Fetching Data...";
             err.style.display = 'none';
 
             let isValid = false;
@@ -273,265 +304,195 @@
             try {
                 if (currentPlatform === 'roblox') {
                     const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/roblox_stats', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username: username })
                     });
-                    
                     const data = await res.json();
-                    
-                    if (data.success) {
-                        isValid = true;
-                        window.realRobloxData = data; 
-                    } else {
-                        err.innerText = data.error || "Roblox user not found.";
-                        err.style.display = 'block';
-                    }
+                    if (data.success) { isValid = true; window.realData = data; } 
+                    else { err.innerText = data.error; err.style.display = 'block'; }
                 } 
                 else if (currentPlatform === 'minecraft') {
-                    const res = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
-                    if (res.status === 200) isValid = true;
-                    else { err.innerText = "Invalid Minecraft Java username."; err.style.display = 'block'; }
+                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/java_skin', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    });
+                    const data = await res.json();
+                    if (data.success) { isValid = true; window.realData = data; } 
+                    else { err.innerText = data.error; err.style.display = 'block'; }
                 } 
                 else if (currentPlatform === 'bedrock') {
-                    const res = await fetch(`https://api.geysermc.org/v2/xbox/user/${username}`);
-                    if (res.status === 200) isValid = true;
-                    else { err.innerText = "Invalid Bedrock Gamertag."; err.style.display = 'block'; }
+                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/bedrock_stats', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    });
+                    const data = await res.json();
+                    if (data.success) { isValid = true; window.realData = data; } 
+                    else { err.innerText = data.error; err.style.display = 'block'; }
                 }
             } catch (e) { 
                 console.error(e); 
-                err.innerText = "Cannot connect to AuraCard Backend. Is Python running?";
-                err.style.display = 'block';
+                err.innerText = "Cannot connect to Backend."; err.style.display = 'block';
             }
 
             btn.innerText = "Validate";
             
             if (isValid) {
                 validatedUsername = username;
-                document.getElementById('card-details').style.display = 'block';
-                document.getElementById('modal-actions').style.display = 'none';
+                closeModal();
+                await generateCard(); 
             }
         });
 
         async function generateCard() {
-            let stat1, stat2, stat3, bio, title, titleColor;
-            let label1 = "ACCOUNT AGE", label2 = "AURA SCORE", label3 = "FOLLOWERS";
-            let color1 = "#fff", color2 = "#00e5ff", color3 = "#ff6464";
+            let stat1, stat2, stat3, stat4, stat5, bio, title, titleColor;
+            let label1, label2, label3, label4, label5;
 
-            if (currentPlatform === 'roblox' && window.realRobloxData) {
-                const d = window.realRobloxData;
-                
-                stat1 = d.games_played;
-                stat2 = d.games_won;
-                stat3 = d.friends + " Friends";
-                
+            if (window.realData) {
+                const d = window.realData;
+                title = d.title || "Player";
+                titleColor = (d.aura_level >= 100) ? '#ffd700' : '#00e5ff';
                 bio = d.description || "No bio set.";
-                title = d.title;
-                titleColor = d.years_old >= 8 ? '#ffd700' : '#00e5ff';
                 
-                label1 = "GAMES PLAYED";
-                label2 = "GAMES WON";
-                label3 = "FRIENDS";
-
-                if (d.aura_score >= 5000) { funkPlayer.src = FUNK_HIGH; } 
-                else if (d.aura_score >= 2000) { funkPlayer.src = FUNK_MID; } 
-                else { funkPlayer.src = FUNK_LOW; }
-            } 
-            else {
-                let hash = 0;
-                for (let i = 0; i < validatedUsername.length; i++) {
-                    hash = validatedUsername.charCodeAt(i) + ((hash << 5) - hash);
+                if (currentPlatform === 'roblox') {
+                    stat1 = d.games_played || "0";
+                    stat2 = d.games_won || "0";
+                    stat3 = d.aura_streak || "0x";
+                    stat4 = d.most_played_game || "Rivals"; // Default fallback
+                    stat5 = d.friends !== undefined ? d.friends : "0";
+                    
+                    label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS";
+                } else {
+                    stat1 = d.games_played || "0";
+                    stat2 = d.games_won || "0";
+                    stat3 = d.aura_streak || "0x";
+                    stat4 = currentPlatform.toUpperCase();
+                    stat5 = d.friends !== undefined ? d.friends : "0";
+                    
+                    label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "PLATFORM"; label5 = "FRIENDS";
                 }
-                
-                stat1 = Math.abs(hash % 2350) + 150; 
-                stat2 = stat1 + Math.abs(hash % 800) + 50;
-                stat3 = `${Math.abs(hash % 45) + 5}x Win Streak`;
-                bio = `The Ultimate ${currentPlatform.toUpperCase()} Legend.`;
-                
-                title = `${currentPlatform.charAt(0).toUpperCase() + currentPlatform.slice(1)} Player`;
-                titleColor = '#969696';
-                if (stat1 > 1500) { title = `${currentPlatform} Legend`; titleColor = '#ffd700'; }
-                else if (stat1 > 800) { title = `${currentPlatform} Pro`; titleColor = '#ff6464'; }
-                
-                label1 = "GAMES PLAYED";
-                label2 = "GAMES WON";
-                label3 = "AURA STREAK";
 
-                funkPlayer.src = FUNK_MID; 
+                if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } 
+                else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } 
+                else { funkPlayer.src = FUNK_LOW; }
             }
 
-            funkPlayer.volume = 0.5;
-            funkPlayer.play().catch(e => console.log("Audio blocked: ", e));
+            funkPlayer.volume = 0.5; 
+            funkPlayer.play().catch(e => console.log("Audio blocked"));
 
             const canvas = document.getElementById('card-canvas');
-            canvas.width = 900;
-            canvas.height = 600;
+            canvas.width = 900; canvas.height = 600;
             const ctx = canvas.getContext('2d');
 
-            ctx.fillStyle = '#0f0f13';
-            ctx.fillRect(0, 0, 900, 600);
-            ctx.strokeStyle = '#00e5ff';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(10, 10, 880, 580);
+            // Background
+            ctx.fillStyle = '#0f0f13'; ctx.fillRect(0, 0, 900, 600);
+            ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, 880, 580);
 
-            ctx.fillStyle = '#00e5ff';
-            ctx.font = 'bold 50px "Montserrat", sans-serif';
-            ctx.fillText("AURACARD", 50, 80);
-            
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 30px "Montserrat", sans-serif';
-            ctx.fillText(validatedUsername, 50, 130);
-            
-            ctx.fillStyle = titleColor;
-            ctx.font = 'bold 20px "Roboto", sans-serif';
-            ctx.fillText(title.toUpperCase(), 50, 160);
+            // Header
+            ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 50px "Montserrat", sans-serif'; ctx.fillText("AURACARD", 50, 80);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 30px "Montserrat", sans-serif'; ctx.fillText(validatedUsername, 50, 130);
+            ctx.fillStyle = titleColor; ctx.font = 'bold 20px "Roboto", sans-serif'; ctx.fillText(title.toUpperCase(), 50, 160);
 
-            // --- FULL BODY AVATAR & AURA EFFECT ---
-            if (currentPlatform === 'roblox' && window.realRobloxData && window.realRobloxData.avatar_url) {
-                const avatarImg = await loadImage(window.realRobloxData.avatar_url);
+            // Avatar
+            if (window.realData && window.realData.avatar_url) {
+                const avatarImg = await loadImage(window.realData.avatar_url);
                 if (avatarImg) {
-                    const centerX = 740; 
-                    const centerY = 280;
-                    
-                    // 1. Draw Aura Glow (Radial Gradient)
+                    const centerX = 740, centerY = 280;
                     const gradient = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, 200);
-                    gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)');
-                    gradient.addColorStop(1, 'rgba(0, 229, 255, 0)');
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(centerX - 200, centerY - 200, 400, 400);
+                    gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    ctx.fillStyle = gradient; ctx.fillRect(centerX - 200, centerY - 200, 400, 400);
 
-                    // 2. Draw Glowing Rings (Aura Pose vibes)
-                    ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.ellipse(centerX, centerY + 120, 100, 25, 0, 0, Math.PI * 2);
-                    ctx.stroke();
+                    ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(centerX, centerY + 120, 100, 25, 0, 0, Math.PI * 2); ctx.stroke();
                     
-                    ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
-                    ctx.beginPath();
-                    ctx.ellipse(centerX, centerY + 120, 130, 35, 0, 0, Math.PI * 2);
-                    ctx.stroke();
-
-                    // 3. Draw the Full Body Avatar
-                    const avatarSize = 320;
+                    const avatarSize = 300;
                     ctx.drawImage(avatarImg, centerX - (avatarSize/2), centerY - (avatarSize/2) - 20, avatarSize, avatarSize);
                 }
             }
 
-            // Stats Box
-            ctx.fillStyle = '#191920';
-            ctx.fillRect(50, 400, 800, 150);
-            ctx.strokeStyle = '#32323c';
-            ctx.strokeRect(50, 400, 800, 150);
+            // Stats Box (Bigger to fit all stats)
+            ctx.fillStyle = '#191920'; ctx.fillRect(50, 380, 800, 180);
+            ctx.strokeStyle = '#32323c'; ctx.strokeRect(50, 380, 800, 180);
 
-            ctx.fillStyle = '#969696';
-            ctx.font = '14px "Roboto", sans-serif';
-            ctx.fillText(label1, 80, 430);
-            ctx.fillStyle = color1;
-            ctx.font = 'bold 28px "Montserrat", sans-serif';
-            ctx.fillText(stat1, 80, 460);
+            // Row 1
+            ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; 
+            ctx.fillText(label1, 80, 410); ctx.fillText(label2, 300, 410); ctx.fillText(label3, 520, 410);
+            
+            ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 28px "Montserrat", sans-serif'; ctx.fillText(stat1, 80, 440);
+            ctx.fillStyle = '#ff6464'; ctx.fillText(stat2, 300, 440);
+            ctx.fillStyle = '#fff'; ctx.fillText(stat3, 520, 440);
 
-            ctx.fillStyle = '#969696';
-            ctx.font = '14px "Roboto", sans-serif';
-            ctx.fillText(label2, 300, 430);
-            ctx.fillStyle = color2;
-            ctx.font = 'bold 28px "Montserrat", sans-serif';
-            ctx.fillText(stat2, 300, 460);
+            // Row 2
+            ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; 
+            ctx.fillText(label4, 80, 490); ctx.fillText(label5, 300, 490);
+            
+            ctx.fillStyle = '#ffd700'; ctx.font = 'bold 24px "Montserrat", sans-serif'; ctx.fillText(stat4, 80, 520);
+            ctx.fillStyle = '#fff'; ctx.fillText(stat5, 300, 520);
 
-            ctx.fillStyle = '#969696';
-            ctx.font = '14px "Roboto", sans-serif';
-            ctx.fillText(label3, 520, 430);
-            ctx.fillStyle = color3;
-            ctx.font = 'bold 28px "Montserrat", sans-serif';
-            ctx.fillText(stat3, 520, 460);
-
-            // Bio (Restricted width to avoid avatar overlap)
-            ctx.fillStyle = '#a0a0a5';
-            ctx.font = '16px "Roboto", sans-serif';
-            let words = bio.split(' ');
-            let line = '';
-            let y = 220;
+            // Bio
+            ctx.fillStyle = '#a0a0a5'; ctx.font = '16px "Roboto", sans-serif';
+            let words = bio.split(' '), line = '', y = 210;
             for(let n = 0; n < words.length; n++) {
               let testLine = line + words[n] + ' ';
-              let metrics = ctx.measureText(testLine);
-              if (metrics.width > 450 && n > 0) { 
-                ctx.fillText(line, 50, y);
-                line = words[n] + ' ';
-                y += 24;
-              } else {
-                line = testLine;
-              }
+              if (ctx.measureText(testLine).width > 450 && n > 0) { ctx.fillText(line, 50, y); line = words[n] + ' '; y += 24; } 
+              else { line = testLine; }
             }
             ctx.fillText(line, 50, y);
 
-            const preview = document.getElementById('canvas-preview');
-            preview.src = canvas.toDataURL('image/png');
-            preview.style.display = 'block';
-            document.getElementById('card-details').style.display = 'none';
-
-            if (db && currentUser) {
-                try {
-                    await db.collection('auracards').add({
-                        user: currentUser.uid,
-                        platform: currentPlatform,
-                        username: validatedUsername,
-                        wins: parseInt(stat1) || 0,
-                        bio: bio,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch(e) { console.log("DB Error: ", e); }
-            }
+            const largePreview = document.getElementById('large-preview');
+            largePreview.src = canvas.toDataURL('image/png');
+            largePreview.style.display = 'block';
             
-            setTimeout(() => {
-                closeModal();
-                loadLeaderboard(currentPlatform);
-            }, 3000);
+            document.getElementById('card-viewer').classList.add('active');
+            document.getElementById('viewer-actions').style.display = 'flex';
+
+            window.generatedCardData = { image: largePreview.src, platform: currentPlatform, username: validatedUsername, level: parseInt(stat1.replace("Lvl ", "")) || 0, bio: bio };
         }
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!window.generatedCardData) return;
+            const link = document.createElement('a');
+            link.download = `${window.generatedCardData.username}_AuraCard.png`;
+            link.href = window.generatedCardData.image;
+            link.click();
+        });
+
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            if (!window.generatedCardData || !db || !currentUser) return;
+            const btn = document.getElementById('uploadBtn');
+            btn.innerText = "Uploading..."; btn.disabled = true;
+            try {
+                await db.collection('auracards').add({
+                    user: currentUser.uid, platform: window.generatedCardData.platform, username: window.generatedCardData.username,
+                    wins: window.generatedCardData.level, bio: window.generatedCardData.bio, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('upload-success').style.display = 'block';
+                btn.innerText = "✅ Uploaded!";
+                setTimeout(() => { closeViewer(); loadLeaderboard(currentPlatform); }, 2500);
+            } catch(e) { alert("Failed to upload."); btn.innerText = "🚀 Upload"; btn.disabled = false; }
+        });
 
         function loadLeaderboard(platform) {
             const list = document.getElementById('leaderboard-content');
-            list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading top players...</p>`;
-            
+            list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`;
             if (!db) return;
-
-            db.collection('auracards')
-              .where('platform', '==', platform)
-              .orderBy('wins', 'desc')
-              .limit(10)
-              .get()
-              .then((querySnapshot) => {
+            db.collection('auracards').where('platform', '==', platform).orderBy('wins', 'desc').limit(10).get()
+              .then((snap) => {
                   list.innerHTML = "";
-                  if (querySnapshot.empty) {
-                      list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`;
-                      return;
-                  }
+                  if (snap.empty) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
                   let rank = 1;
-                  querySnapshot.forEach((doc) => {
+                  snap.forEach((doc) => {
                       const data = doc.data();
                       const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
-                      list.innerHTML += `
-                          <div class="player-row">
-                              <span>#${rank} ${data.username}</span> 
-                              <span style="color: ${color};">${data.wins} Aura</span>
-                          </div>
-                      `;
+                      list.innerHTML += `<div class="player-row"><span>#${rank} ${data.username}</span> <span style="color: ${color};">Lvl ${data.wins}</span></div>`;
                       rank++;
                   });
-              }).catch((error) => {
-                  console.log("Leaderboard error: ", error);
-                  list.innerHTML = `<p style="text-align: center; color: var(--muted);">Create a database index in Firebase to load leaderboard.</p>`;
-              });
+              }).catch((err) => { list.innerHTML = `<p>Database index needed.</p>`; });
         }
 
         auth.onAuthStateChanged((user) => {
             if (user) {
-                currentUser = user;
-                document.getElementById('user-name').innerText = user.displayName || "Gamer";
-                document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
-                showScreen('dashboard-screen');
-            } else {
-                showScreen('login-screen');
-            }
+                currentUser = user; document.getElementById('user-name').innerText = user.displayName || "Gamer";
+                document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35"; showScreen('dashboard-screen');
+            } else { showScreen('login-screen'); }
         });
     </script>
 </body>
