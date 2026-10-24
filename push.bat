@@ -1,15 +1,18 @@
 @echo off
 title AuraCard Auto-Push
-echo Pushing changes to GitHub...
+echo ========================================
+echo       AURACARD GITHUB UPLOADER
+echo ========================================
+echo.
+
+set /p commit_msg="Type your commit message (e.g., 'Added new stats'): "
 
 git add .
-git commit -m "Auto-update from PC"
+git commit -m "%commit_msg%"
 git push
 
 echo.
 echo ========================================
 echo Done! Check the messages above.
-echo If it says "Everything up-to-date", nothing changed.
-echo If there is a red error, you might need to pull first.
 echo ========================================
 pause
