@@ -139,6 +139,9 @@
                 <div class="platform-card" onclick="selectPlatform('roblox')">
                     <div class="platform-icon">🟥</div><h3>Roblox</h3>
                 </div>
+                <div class="platform-card" onclick="selectPlatform('youtube')">
+                    <div class="platform-icon" style="color: var(--yt-red);">▶️</div><h3>YouTube</h3>
+                </div>
             </div>
         </div>
     </div>
@@ -168,20 +171,20 @@
         <div class="modal">
             <h2>Create AuraCard</h2>
             <div class="form-group">
-                <label>Username (Premium Only)</label>
-                <input type="text" id="input-username" placeholder="Enter username...">
+                <label>Username / Handle</label>
+                <input type="text" id="input-username" placeholder="Enter username or @handle...">
             </div>
             
-            <!-- NEW FIELDS -->
-            <div class="form-group">
+            <div class="form-group" id="roblox-inputs" style="display: none;">
                 <label>Most Played Game (Roblox)</label>
                 <input type="text" id="input-game" placeholder="e.g., Rivals" value="Rivals">
+                
+                <label>Total Wins in that game (Optional)</label>
+                <input type="number" id="input-won" placeholder="e.g., 500">
+                <p style="font-size: 11px; color: var(--accent); margin-top: 5px; line-height: 1.4;">
+                    💡 <b>How to find this:</b> Open the game, go to your profile, and check your total wins. Leave blank to auto-generate!
+                </p>
             </div>
-            <div class="form-group">
-                <label>Total Games Played (For Aura Calculation)</label>
-                <input type="number" id="input-played" placeholder="e.g., 1500" value="1000">
-            </div>
-            <!-- END NEW FIELDS -->
 
             <p id="validation-error" style="color: #ff5252; font-size: 12px; display: none;">Error!</p>
             
@@ -249,9 +252,17 @@
 
         function selectPlatform(platform) {
             currentPlatform = platform;
-            const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox' };
+            const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' };
             document.getElementById('platform-title').innerText = titleMap[platform];
             document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`;
+            
+            // Show Roblox specific inputs only if Roblox is selected
+            if (platform === 'roblox') {
+                document.getElementById('roblox-inputs').style.display = 'block';
+            } else {
+                document.getElementById('roblox-inputs').style.display = 'none';
+            }
+
             showScreen('platform-screen');
             loadLeaderboard(platform);
         }
@@ -290,7 +301,7 @@
             document.getElementById('validation-error').style.display = 'none';
             document.getElementById('input-username').value = "";
             document.getElementById('input-game').value = "Rivals";
-            document.getElementById('input-played').value = "1000";
+            document.getElementById('input-won').value = "";
             window.realData = null;
             window.generatedCardData = null;
         });
@@ -321,20 +332,25 @@
             try {
                 if (currentPlatform === 'roblox') {
                     const manualGame = document.getElementById('input-game').value.trim() || "Rivals";
-                    const manualPlayed = document.getElementById('input-played').value.trim() || "0";
+                    const manualWon = document.getElementById('input-won').value.trim() || "0";
 
                     const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/roblox_stats', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            username: username,
-                            most_played_game: manualGame,
-                            games_played: manualPlayed
-                        })
+                        body: JSON.stringify({ username: username, most_played_game: manualGame, games_won: manualWon })
                     });
                     const data = await res.json();
                     if (data.success) { isValid = true; window.realData = data; } 
                     else { err.innerText = data.error; err.style.display = 'block'; }
                 } 
+                else if (currentPlatform === 'youtube') {
+                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/yt_stats', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    });
+                    const data = await res.json();
+                    if (data.success) { isValid = true; window.realData = data; } 
+                    else { err.innerText = data.error; err.style.display = 'block'; }
+                }
                 else if (currentPlatform === 'minecraft') {
                     const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/java_skin', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -383,15 +399,20 @@
                     stat3 = d.aura_streak || "0x";
                     stat4 = d.most_played_game || "Rivals"; 
                     stat5 = d.friends !== undefined ? d.friends : "0";
-                    
                     label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS";
+                } else if (currentPlatform === 'youtube') {
+                    stat1 = "Lvl " + d.aura_level;
+                    stat2 = d.subs.toLocaleString();
+                    stat3 = d.views.toLocaleString();
+                    stat4 = "YouTube";
+                    stat5 = "Creator";
+                    label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS";
                 } else {
                     stat1 = d.games_played || "0";
                     stat2 = d.games_won || "0";
                     stat3 = d.aura_streak || "0x";
                     stat4 = currentPlatform.toUpperCase();
                     stat5 = d.friends !== undefined ? d.friends : "0";
-                    
                     label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "PLATFORM"; label5 = "FRIENDS";
                 }
 
