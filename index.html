@@ -502,17 +502,38 @@
 
         document.getElementById('uploadBtn').addEventListener('click', async () => {
             if (!window.generatedCardData || !db || !currentUser) return;
+            
             const btn = document.getElementById('uploadBtn');
-            btn.innerText = "Uploading..."; btn.disabled = true;
+            btn.innerText = "Uploading..."; 
+            btn.disabled = true;
+
             try {
-                await db.collection('auracards').add({
-                    user: currentUser.uid, platform: window.generatedCardData.platform, username: window.generatedCardData.username,
-                    wins: window.generatedCardData.level, bio: window.generatedCardData.bio, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                // Unique ID to prevent duplicates
+                const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`;
+
+                await db.collection('auracards').doc(uniqueDocId).set({
+                    user: currentUser.uid, 
+                    platform: window.generatedCardData.platform, 
+                    username: window.generatedCardData.username,
+                    wins: window.generatedCardData.level, 
+                    bio: window.generatedCardData.bio, 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
                 document.getElementById('upload-success').style.display = 'block';
                 btn.innerText = "✅ Uploaded!";
-                setTimeout(() => { closeViewer(); loadLeaderboard(currentPlatform); }, 2500);
-            } catch(e) { alert("Failed to upload."); btn.innerText = "🚀 Upload"; btn.disabled = false; }
+                
+                setTimeout(() => { 
+                    closeViewer(); 
+                    loadLeaderboard(currentPlatform); 
+                }, 2500);
+                
+            } catch(e) { 
+                console.error("DB Error: ", e);
+                alert("Failed to upload."); 
+                btn.innerText = "🚀 Upload"; 
+                btn.disabled = false; 
+            }
         });
 
         function loadLeaderboard(platform) {
