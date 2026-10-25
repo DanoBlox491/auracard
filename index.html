@@ -12,8 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 2.4 (Minecraft Stats + Image Viewer)
-        const CURRENT_VERSION = "2.4"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 2.6 (Showcase Button Update)
+        const CURRENT_VERSION = "2.6"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -21,7 +21,7 @@
     </script>
 
     <style>
-        :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; --yt-red: #ff0000; --green: #4CAF50; }
+        :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; --yt-red: #ff0000; --green: #4CAF50; --orange: #ff9800; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
         
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
@@ -31,6 +31,14 @@
         .nav-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); }
         .nav-user { display: flex; align-items: center; gap: 10px; }
         .nav-user img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--accent); }
+        
+        /* ☕ SUPPORT & 🎥 SHOWCASE BUTTONS */
+        .support-btn { background: var(--orange); border: none; color: #fff; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 5px; transition: 0.3s; }
+        .support-btn:hover { background: #e68a00; transform: scale(1.05); }
+        
+        .showcase-btn { background: #ff0000; border: none; color: #fff; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 5px; transition: 0.3s; }
+        .showcase-btn:hover { background: #cc0000; transform: scale(1.05); }
+
         .logout-btn { background: transparent; border: 1px solid #ff5252; color: #ff5252; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .logout-btn:hover { background: #ff5252; color: white; }
 
@@ -126,6 +134,10 @@
         .music-toggle:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
         #upload-success { color: var(--green); font-size: 16px; margin-top: 15px; display: none; font-weight: bold; }
+
+        /* ☕ DONATE BUTTON STYLE */
+        .donate-action-btn { background: var(--orange); color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: bold; display: inline-block; transition: 0.3s; border: none; cursor: pointer; }
+        .donate-action-btn:hover { background: #e68a00; transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -159,6 +171,8 @@
         <div class="navbar">
             <div class="nav-title">AuraCard</div>
             <div class="nav-user">
+                <button class="support-btn" onclick="openDonateModal()">☕ Support</button>
+                <button class="showcase-btn" onclick="window.open('https://www.youtube.com/watch?v=z-Ghw6lu2is', '_blank')">🎥 Showcase</button>
                 <img id="user-avatar" src="https://via.placeholder.com/35">
                 <span id="user-name" style="font-weight: bold;">User</span>
                 <button class="logout-btn" id="logoutBtn">Logout</button>
@@ -236,6 +250,8 @@
         <div class="navbar">
             <div class="nav-title" id="platform-title">Platform</div>
             <div class="nav-user">
+                <button class="support-btn" onclick="openDonateModal()">☕ Support</button>
+                <button class="showcase-btn" onclick="window.open('https://www.youtube.com/watch?v=z-Ghw6lu2is', '_blank')">🎥 Showcase</button>
                 <button class="logout-btn" onclick="goToDashboard()" style="border-color: #00e5ff; color: #00e5ff;">Back</button>
             </div>
         </div>
@@ -276,6 +292,26 @@
             <div class="modal-actions" id="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn-submit" id="validateBtn">Validate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ☕ DONATE MODAL -->
+    <div class="modal-overlay" id="donate-modal">
+        <div class="modal" style="text-align: center; border-top-color: var(--orange);">
+            <h2 style="color: var(--orange);">☕ Support AuraCard</h2>
+            <p style="color: var(--muted); font-size: 15px; line-height: 1.5; margin-bottom: 20px;">
+                AuraCard is 100% free and made by a solo developer (Dano)! Your support helps keep the servers running, pays for API costs, and fuels late-night coding sessions.
+            </p>
+            <p style="font-weight: bold; color: var(--gold);">Thank you for being awesome! 👑</p>
+            
+            <!-- ⚠️ REPLACE THE HREF LINK BELOW WITH YOUR ACTUAL KULHAD LINK -->
+            <a href="https://kulhad.co/dano" target="_blank" class="donate-action-btn">
+                ❤️ Buy me a Kulhad (UPI)
+            </a>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDonateModal()">Close</button>
             </div>
         </div>
     </div>
@@ -430,6 +466,10 @@
         document.getElementById('logoutBtn').addEventListener('click', () => {
             auth.signOut(); currentUser = null; showScreen('login-screen');
         });
+
+        // ☕ DONATE MODAL FUNCTIONS
+        function openDonateModal() { document.getElementById('donate-modal').classList.add('active'); }
+        function closeDonateModal() { document.getElementById('donate-modal').classList.remove('active'); }
 
         document.getElementById('openCreateModal').addEventListener('click', () => {
             document.getElementById('create-modal').classList.add('active');
