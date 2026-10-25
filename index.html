@@ -12,8 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 1.7 (Audio Fix)
-        const CURRENT_VERSION = "1.7"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 2.4
+        const CURRENT_VERSION = "2.4"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -56,9 +56,25 @@
         .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
         .add-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(0,229,255,0.5); }
         
-        .leaderboard-list { width: 100%; background: var(--panel); border-radius: 12px; padding: 20px; box-sizing: border-box; }
-        .player-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #333; }
-        .player-row:last-child { border-bottom: none; }
+        .leaderboard-list { width: 100%; background: var(--panel); border-radius: 12px; padding: 10px; box-sizing: border-box; }
+        
+        .lb-card { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; 
+            background: #15151a; border: 1px solid #333; cursor: pointer; transition: 0.2s;
+        }
+        .lb-card:hover { transform: scale(1.02); border-color: var(--accent); }
+        .lb-card:last-child { margin-bottom: 0; }
+        
+        .lb-card.rank-1 { background: rgba(255, 215, 0, 0.1); border: 2px solid var(--gold); }
+        
+        .lb-left { display: flex; align-items: center; gap: 15px; }
+        .lb-rank { font-weight: 900; font-size: 18px; color: var(--muted); width: 30px; }
+        .rank-1 .lb-rank { color: var(--gold); }
+        .lb-icon { width: 35px; height: 35px; }
+        .lb-name { font-size: 18px; font-weight: bold; font-family: 'Montserrat', sans-serif; }
+        .lb-level { font-size: 16px; font-weight: bold; color: var(--accent); }
+        .rank-1 .lb-level { color: var(--gold); }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
@@ -87,12 +103,14 @@
         }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        .viewer-actions { display: flex; gap: 20px; margin-top: 30px; }
-        .viewer-actions button { padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        .viewer-actions { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; justify-content: center; }
+        .viewer-actions button { padding: 15px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .btn-download { background: var(--green); color: white; }
         .btn-download:hover { background: #388e3c; transform: scale(1.05); }
         .btn-upload { background: var(--accent); color: #000; }
         .btn-upload:hover { background: #00b8cc; transform: scale(1.05); }
+        .btn-share { background: #9c27b0; color: white; }
+        .btn-share:hover { background: #7b1fa2; transform: scale(1.05); }
         
         .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; transition: 0.3s; }
         .close-viewer:hover { color: #ff5252; transform: rotate(90deg); }
@@ -112,8 +130,7 @@
 </head>
 <body>
 
-    <!-- 🎵 Added an onerror catch just in case! -->
-    <audio id="funkPlayer" loop preload="auto" onerror="alert('Audio failed to load from the server!')"></audio>
+    <audio id="funkPlayer" loop preload="auto"></audio>
 
     <!-- SCREEN 1: LOGIN -->
     <div id="login-screen" class="screen active">
@@ -152,7 +169,6 @@
             <h2 style="text-align: center; font-family: 'Montserrat';">Select Your Platform</h2>
             <div class="platform-grid">
                 
-                <!-- ⛏️ Java 3D Grass Block -->
                 <div class="platform-card" onclick="selectPlatform('minecraft')">
                     <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/>
@@ -170,7 +186,6 @@
                     <h3>Minecraft Java</h3>
                 </div>
                 
-                <!-- 🪨 Bedrock 2D Pixel Grass Block -->
                 <div class="platform-card" onclick="selectPlatform('bedrock')">
                     <svg class="platform-logo" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
                         <rect width="16" height="16" fill="#8B5A2B"/>
@@ -195,7 +210,6 @@
                     <h3>Minecraft Bedrock</h3>
                 </div>
                 
-                <!-- 🟥 Official Roblox App Icon -->
                 <div class="platform-card" onclick="selectPlatform('roblox')">
                     <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100" height="100" fill="#0074FF"/>
@@ -205,7 +219,6 @@
                     <h3>Roblox</h3>
                 </div>
                 
-                <!-- ▶️ Official YouTube Icon -->
                 <div class="platform-card" onclick="selectPlatform('youtube')">
                     <svg class="platform-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
@@ -272,10 +285,13 @@
         <button class="close-viewer" onclick="closeViewer()">✖</button>
         <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">🔇 Click to Play Music</button>
         <img id="large-preview">
-        <div class="viewer-actions" id="viewer-actions" style="display: none;">
+        
+        <div class="viewer-actions" id="viewer-actions">
             <button class="btn-download" id="downloadBtn">📥 Download PNG</button>
+            <button class="btn-share" id="shareBtn" style="display: none;">📤 Share Card</button>
             <button class="btn-upload" id="uploadBtn">🚀 Upload to AuraCard</button>
         </div>
+        
         <p id="upload-success">✅ Successfully uploaded to the gallery!</p>
         <canvas id="card-canvas" style="display: none;"></canvas>
     </div>
@@ -300,10 +316,10 @@
         let validatedUsername = "";
         window.realData = null; 
         window.generatedCardData = null;
+        window.leaderboardCache = {}; 
 
         const funkPlayer = document.getElementById('funkPlayer');
         
-        // 🎵 BULLETPROOF AUDIO LINKS (SoundHelix - Public Domain, No Hotlink Blocking)
         const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
         const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
         const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
@@ -337,9 +353,13 @@
                 funkPlayer.play()
                     .then(() => updateMusicUI(true))
                     .catch((e) => {
-                        console.log('Play failed:', e);
-                        updateMusicUI(false);
-                        alert('Music error: ' + e.message); // Show the error on screen
+                        if (e.name === 'AbortError' || e.message.includes('interrupted')) {
+                            console.log('Playback interrupted safely.');
+                        } else {
+                            console.log('Play failed:', e);
+                            alert('Music error: ' + e.message);
+                            updateMusicUI(false);
+                        }
                     });
             } else {
                 funkPlayer.pause();
@@ -353,6 +373,18 @@
         }
 
         function goToDashboard() { showScreen('dashboard-screen'); }
+
+        function getPlatformIconSVG(platform) {
+            if (platform === 'minecraft') {
+                return `<svg class="lb-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`;
+            } else if (platform === 'bedrock') {
+                return `<svg class="lb-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/><rect x="2" y="1" width="2" height="2" fill="#4C8232"/><rect x="7" y="0" width="2" height="2" fill="#4C8232"/><rect x="11" y="2" width="2" height="2" fill="#4C8232"/></svg>`;
+            } else if (platform === 'roblox') {
+                return `<svg class="lb-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`;
+            } else {
+                return `<svg class="lb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
+            }
+        }
 
         function selectPlatform(platform) {
             currentPlatform = platform;
@@ -416,11 +448,12 @@
             updateMusicUI(false);
             document.getElementById('card-viewer').classList.remove('active');
             document.getElementById('large-preview').style.display = 'none';
-            document.getElementById('viewer-actions').style.display = 'none';
             document.getElementById('upload-success').style.display = 'none';
             document.getElementById('downloadBtn').innerText = "📥 Download PNG";
             document.getElementById('uploadBtn').innerText = "🚀 Upload to AuraCard";
             document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('uploadBtn').style.display = 'block';
+            document.getElementById('shareBtn').style.display = 'none';
         }
 
         document.getElementById('validateBtn').addEventListener('click', async () => {
@@ -513,12 +546,13 @@
                     stat5 = "Creator";
                     label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS";
                 } else {
-                    stat1 = d.games_played || "0";
-                    stat2 = d.games_won || "0";
-                    stat3 = d.aura_streak || "0x";
+                    // 🧱 MINECRAFT JAVA & BEDROCK (Real Stats)
+                    stat1 = d.blocks_mined || "0";
+                    stat2 = d.mobs_killed || "0";
+                    stat3 = d.diamonds_found || "0";
                     stat4 = currentPlatform.toUpperCase();
-                    stat5 = d.friends !== undefined ? d.friends : "0";
-                    label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "PLATFORM"; label5 = "FRIENDS";
+                    stat5 = d.playtime || "0 Hours";
+                    label1 = "BLOCKS MINED"; label2 = "MOBS KILLED"; label3 = "DIAMONDS"; label4 = "PLATFORM"; label5 = "PLAYTIME";
                 }
 
                 if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } 
@@ -581,17 +615,22 @@
             ctx.fillText(line, 50, y);
 
             const largePreview = document.getElementById('large-preview');
-            largePreview.src = canvas.toDataURL('image/png');
+            
+            const compressedImage = canvas.toDataURL('image/jpeg', 0.8);
+            largePreview.src = compressedImage;
             largePreview.style.display = 'block';
             
             document.getElementById('card-viewer').classList.add('active');
+            
             document.getElementById('viewer-actions').style.display = 'flex';
+            document.getElementById('uploadBtn').style.display = 'block';
+            document.getElementById('shareBtn').style.display = 'none';
 
             window.generatedCardData = {
-                image: largePreview.src,
+                image: compressedImage,
                 platform: currentPlatform,
                 username: validatedUsername,
-                level: parseInt(stat1.replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0,
+                level: parseInt(String(stat1).replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0,
                 bio: bio
             };
         }
@@ -609,7 +648,7 @@
         document.getElementById('downloadBtn').addEventListener('click', () => {
             if (!window.generatedCardData) return;
             const link = document.createElement('a');
-            link.download = `${window.generatedCardData.username}_AuraCard.png`;
+            link.download = `${window.generatedCardData.username}_AuraCard.jpg`;
             link.href = window.generatedCardData.image;
             link.click();
         });
@@ -624,17 +663,26 @@
             try {
                 const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`;
 
-                await db.collection('auracards').doc(uniqueDocId).set({
+                const uploadPromise = db.collection('auracards').doc(uniqueDocId).set({
                     user: currentUser.uid, 
                     platform: window.generatedCardData.platform, 
                     username: window.generatedCardData.username,
                     wins: window.generatedCardData.level, 
                     bio: window.generatedCardData.bio, 
+                    image: window.generatedCardData.image, 
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Upload timed out! Check your Firebase rules.")), 10000)
+                );
+
+                await Promise.race([uploadPromise, timeoutPromise]);
                 
                 document.getElementById('upload-success').style.display = 'block';
                 btn.innerText = "✅ Uploaded!";
+                
+                document.getElementById('shareBtn').style.display = 'flex';
                 
                 setTimeout(() => { 
                     closeViewer(); 
@@ -643,9 +691,30 @@
                 
             } catch(e) { 
                 console.error("DB Error: ", e);
-                alert("Failed to upload."); 
+                alert("Upload failed: " + e.message); 
                 btn.innerText = "🚀 Upload"; 
                 btn.disabled = false; 
+            }
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', async () => {
+            if (!window.generatedCardData) return;
+            
+            const shareData = {
+                title: 'AuraCard',
+                text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`,
+                url: 'https://auracard.isroot.in'
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`);
+                    alert("Link copied to clipboard! Share it with your friends.");
+                }
+            } catch (err) {
+                console.log('Error sharing:', err);
             }
         });
 
@@ -653,19 +722,74 @@
             const list = document.getElementById('leaderboard-content');
             list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`;
             if (!db) return;
+            
             db.collection('auracards').where('platform', '==', platform).orderBy('wins', 'desc').limit(10).get()
               .then((snap) => {
                   list.innerHTML = "";
                   if (snap.empty) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
+                  
                   let rank = 1;
                   snap.forEach((doc) => {
                       const data = doc.data();
+                      
+                      window.leaderboardCache[doc.id] = data;
+
                       const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
                       const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
-                      list.innerHTML += `<div class="player-row"><span>#${rank} ${data.username}</span> <span style="color: ${color};">${winLabel}</span></div>`;
+                      const crown = rank === 1 ? '👑' : '';
+                      const rowClass = rank === 1 ? 'lb-card rank-1' : 'lb-card';
+                      const iconSVG = getPlatformIconSVG(data.platform);
+
+                      list.innerHTML += `
+                        <div class="${rowClass}" onclick="viewLeaderboardCard('${doc.id}')">
+                            <div class="lb-left">
+                                <span class="lb-rank">${crown} #${rank}</span>
+                                ${iconSVG}
+                                <span class="lb-name">${data.username}</span>
+                            </div>
+                            <span class="lb-level" style="color: ${color};">${winLabel}</span>
+                        </div>
+                      `;
                       rank++;
                   });
-              }).catch((err) => { list.innerHTML = `<p>Database index needed.</p>`; });
+              }).catch((err) => { 
+                  console.error("Leaderboard Error: ", err);
+                  const match = err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/);
+                  if (match) {
+                      list.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 16px;">Database index needed!<br><br><a href="${match[0]}" target="_blank" style="color: #00e5ff; font-weight: bold; text-decoration: underline;">CLICK HERE TO CREATE IT</a></p>`;
+                  } else {
+                      list.innerHTML = `<p style="text-align: center; color: #ff5252;">Database index needed. Please create it in Firebase.</p>`;
+                  }
+              });
+        }
+
+        function viewLeaderboardCard(docId) {
+            const data = window.leaderboardCache[docId];
+            if (!data) return;
+
+            if (!data.image) {
+                alert("This card was uploaded before the image update and doesn't have a saved picture. Create a new one!");
+                return;
+            }
+
+            window.generatedCardData = {
+                image: data.image,
+                username: data.username,
+                platform: data.platform,
+                level: data.wins,
+                bio: data.bio
+            };
+
+            const largePreview = document.getElementById('large-preview');
+            largePreview.src = data.image;
+            largePreview.style.display = 'block';
+            
+            document.getElementById('card-viewer').classList.add('active');
+            
+            document.getElementById('viewer-actions').style.display = 'flex';
+            document.getElementById('uploadBtn').style.display = 'none'; 
+            document.getElementById('shareBtn').style.display = 'flex';
+            document.getElementById('upload-success').style.display = 'none';
         }
 
         auth.onAuthStateChanged((user) => {
