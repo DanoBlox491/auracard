@@ -12,8 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 1.6
-        const CURRENT_VERSION = "1.6"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 1.7 (Audio Fix)
+        const CURRENT_VERSION = "1.7"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -112,7 +112,8 @@
 </head>
 <body>
 
-    <audio id="funkPlayer" loop preload="auto"></audio>
+    <!-- 🎵 Added an onerror catch just in case! -->
+    <audio id="funkPlayer" loop preload="auto" onerror="alert('Audio failed to load from the server!')"></audio>
 
     <!-- SCREEN 1: LOGIN -->
     <div id="login-screen" class="screen active">
@@ -302,9 +303,10 @@
 
         const funkPlayer = document.getElementById('funkPlayer');
         
-        const FUNK_LOW = 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3';
-        const FUNK_MID = 'https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3';
-        const FUNK_HIGH = 'https://assets.mixkit.co/music/preview/mixkit-dj-bass-120.mp3';
+        // 🎵 BULLETPROOF AUDIO LINKS (SoundHelix - Public Domain, No Hotlink Blocking)
+        const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+        const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
+        const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
 
         function updateMusicUI(isPlaying) {
             const btn = document.getElementById('musicToggle');
@@ -337,6 +339,7 @@
                     .catch((e) => {
                         console.log('Play failed:', e);
                         updateMusicUI(false);
+                        alert('Music error: ' + e.message); // Show the error on screen
                     });
             } else {
                 funkPlayer.pause();
