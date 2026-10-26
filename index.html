@@ -6,29 +6,42 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- 🚀 SEO UPGRADE -->
-    <title>AuraCard | Custom Roblox & Minecraft Profile Card Tracker</title>
-    <meta name="description" content="Track and showcase your gaming stats! AuraCard is the ultimate free profile card maker for Roblox, Minecraft, and YouTube. Climb the global leaderboard.">
-    <meta name="keywords" content="Roblox stat card, Minecraft aura card, gaming profile creator, gamer aura tracker, AuraCard rivals">
+    <!-- 🚀 GOOGLE SEARCH CONSOLE VERIFICATION -->
+    <meta name="google-site-verification" content="iqVhtEpt5DZjnhkZdzaAkOzM4AwRGHk3PjuZr7CfS08" />
+    
+    <!-- 🚀 SEO UPGRADE: Hyper-Targeted Gaming Keywords -->
+    <title>AuraCard | Roblox Rivals & Minecraft Gaming Profile Card Maker</title>
+    <meta name="description" content="Create your free AuraCard! Track your Roblox Rivals wins, Minecraft blocks mined, and YouTube stats. Generate a custom gaming profile card and climb the global leaderboard.">
+    <meta name="keywords" content="Roblox Rivals stats, Minecraft stat card, Roblox Aura Card, Minecraft profile card maker, gaming stat tracker, Gamer Aura, AuraCard Rivals">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Dano">
 
+    <!-- Open Graph / Facebook / Discord -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://auracard.isroot.in/">
-    <meta property="og:title" content="AuraCard | Custom Roblox & Minecraft Profile Card Tracker">
-    <meta property="og:description" content="Track and showcase your gaming stats! AuraCard is the ultimate free profile card maker for Roblox, Minecraft, and YouTube.">
+    <meta property="og:title" content="AuraCard | Roblox Rivals & Minecraft Gaming Profile Card Maker">
+    <meta property="og:description" content="Track your Roblox Rivals wins and Minecraft stats! Generate a custom gaming profile card and climb the leaderboard.">
     
+    <!-- 🛠️ SCHEMA MARKUP (Hyper-Targeted to prevent Car confusion) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "AuraCard",
+      "@type": "VideoGame",
+      "name": "AuraCard Gaming Profile Generator",
       "url": "https://auracard.isroot.in",
       "applicationCategory": "GameApplication",
-      "operatingSystem": "Web",
+      "operatingSystem": "Web Browser",
       "browserRequirements": "Requires HTML5, JavaScript",
-      "creator": { "@type": "Person", "name": "Dano" },
-      "abstract": "A free interactive gaming profile card creator for Roblox, Minecraft, and YouTube stats."
+      "creator": {
+        "@type": "Person",
+        "name": "Dano"
+      },
+      "about": {
+        "@type": "Thing",
+        "name": "Roblox and Minecraft Gaming Statistics"
+      },
+      "abstract": "A free gaming web app to generate profile stat cards for Roblox Rivals, Minecraft Java, Minecraft Bedrock, and YouTube. Track wins, blocks mined, mobs killed, and Gamer Aura.",
+      "keywords": "Roblox, Rivals, Minecraft, Gaming Profile, Stat Card, Aura Score"
     }
     </script>
     
@@ -38,8 +51,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 5.0
-        const CURRENT_VERSION = "5.0"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 5.2
+        const CURRENT_VERSION = "5.2"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -186,7 +199,7 @@
         </div>
     </div>
 
-    <!-- 🔐 AUTH MODAL (LOGIN) -->
+    <!-- 🔐 AUTH MODAL -->
     <div class="modal-overlay" id="auth-modal">
         <div class="modal" style="text-align: center;">
             <h2 id="auth-modal-title">Log In</h2>
@@ -297,8 +310,8 @@
             </div>
             
             <div class="seo-footer">
-                <h1>AuraCard: Custom Roblox & Minecraft Profile Card Tracker</h1>
-                <p>AuraCard is the ultimate gaming profile brand. Create and download free stat cards for <b>Roblox</b> (games like Rivals), <b>Minecraft Java</b>, <b>Minecraft Bedrock</b>, and <b>YouTube</b>. Track your Gamer Aura score, show off your blocks mined, mobs killed, and diamond counts, and compete on the global leaderboard.</p>
+                <h1>AuraCard: The #1 Roblox Rivals & Minecraft Gaming Profile Card Maker</h1>
+                <p>AuraCard is the ultimate gaming profile brand. Create and download free stat cards for <b>Roblox Rivals</b>, <b>Minecraft Java</b>, <b>Minecraft Bedrock</b>, and <b>YouTube</b>. Track your Gamer Aura score, show off your blocks mined, mobs killed, and diamond counts, and compete on the global leaderboard.</p>
                 <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Built by Dano (11) using HTML, Python, and Firebase. AI was used as a coding co-pilot to help learn and squash bugs!</p>
             </div>
         </div>
@@ -479,11 +492,11 @@
             if (isSignUpMode) {
                 document.getElementById('login-fields').style.display = 'none';
                 document.getElementById('signup-fields').style.display = 'flex';
-                document.getElementById('auth-providers-section').style.display = 'none'; // Hide Auth on Signup
+                document.getElementById('auth-providers-section').style.display = 'none'; 
             } else {
                 document.getElementById('login-fields').style.display = 'flex';
                 document.getElementById('signup-fields').style.display = 'none';
-                document.getElementById('auth-providers-section').style.display = 'block'; // Show Auth on Login
+                document.getElementById('auth-providers-section').style.display = 'block'; 
             }
         }
 
@@ -503,14 +516,11 @@
                     if (pass !== confirm) throw new Error("Passwords do not match.");
                     if (username.includes(' ')) throw new Error("Username cannot have spaces.");
 
-                    // 1. Check if Username is taken
                     const userDoc = await db.collection('users').where('username', '==', username.toLowerCase()).get();
                     if (!userDoc.empty) throw new Error("Username is already taken!");
 
-                    // 2. Create Auth Account
                     const cred = await auth.createUserWithEmailAndPassword(email, pass);
                     
-                    // 3. Save User data to Firestore
                     await db.collection('users').doc(cred.user.uid).set({
                         username: username.toLowerCase(),
                         email: email,
@@ -524,14 +534,10 @@
 
                     if (!username || !pass) throw new Error("Please fill all fields.");
 
-                    // 1. Find user by username
                     const userDoc = await db.collection('users').where('username', '==', username.toLowerCase()).get();
                     if (userDoc.empty) throw new Error("User not found.");
 
-                    // 2. Get Email
                     const email = userDoc.docs[0].data().email;
-
-                    // 3. Sign In
                     await auth.signInWithEmailAndPassword(email, pass);
                     closeAuthModal();
                 }
@@ -674,7 +680,6 @@
                 let displayName = user.displayName;
                 if (!displayName && user.email) { displayName = user.email.split('@')[0]; }
                 
-                // Fetch username from Firestore
                 db.collection('users').doc(user.uid).get().then(doc => {
                     if (doc.exists && doc.data().username) {
                         displayName = doc.data().username;
