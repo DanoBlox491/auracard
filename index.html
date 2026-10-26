@@ -6,11 +6,19 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- 🚀 SEO UPGRADE: #1 Gaming Brand -->
-    <title>AuraCard | The #1 Gaming Aura Card for Roblox, Minecraft & YouTube</title>
-    <meta name="description" content="AuraCard is the ultimate gaming profile brand. Generate custom stat cards for Roblox, Minecraft Java, Minecraft Bedrock, and YouTube. Show off your Gamer Aura and climb the global leaderboard!">
-    <meta name="keywords" content="AuraCard, Gamer Aura, Roblox Aura Card, Minecraft Aura Card, YouTube Aura Card, Gaming Leaderboard, Dano">
+    <!-- 🚀 SEO CHEAT CODE APPLIED: Avoiding the Scam Filter -->
+    <title>AuraCard | The #1 Gaming Profile & Stat Card Maker</title>
+    <meta name="title" content="AuraCard | The #1 Gaming Profile & Stat Card Maker">
+    <meta name="description" content="Show your gaming aura to the internet! Create and download free stat cards for Roblox, Minecraft, and YouTube. Track your Gamer Aura score and climb the leaderboard.">
+    <meta name="keywords" content="Roblox stat card, Minecraft aura card, gaming profile creator, gamer aura tracker, AuraCard rivals">
+    <meta name="robots" content="index, follow">
     <meta name="author" content="Dano">
+
+    <!-- Open Graph / Facebook / Discord -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://auracard.isroot.in/">
+    <meta property="og:title" content="AuraCard | The #1 Gaming Profile & Stat Card Maker">
+    <meta property="og:description" content="Show your gaming aura to the internet! Create and download free stat cards for Roblox, Minecraft, and YouTube.">
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -18,8 +26,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 3.9 (Email Auth Update)
-        const CURRENT_VERSION = "3.9"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 4.1 (Guest Mode & Background)
+        const CURRENT_VERSION = "4.1"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -28,22 +36,34 @@
 
     <style>
         :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; --yt-red: #ff0000; --green: #4CAF50; --orange: #ff9800; --purple: #9c27b0; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        /* 🎨 ROBLOX STYLE BACKGROUND */
+        .bg-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover; background-position: center;
+            filter: blur(8px) brightness(0.3);
+            z-index: -1;
+            transform: scale(1.1); /* Prevents white edges from blur */
+        }
+
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; position: relative; z-index: 1; }
         .screen.active { display: flex; }
 
         .landing-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; text-align: center; }
-        .landing-title { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--accent); font-size: 60px; margin: 0; text-shadow: 0 0 20px rgba(0,229,255,0.4); }
-        .landing-subtitle { color: var(--muted); font-size: 20px; margin-top: 10px; margin-bottom: 50px; }
-        .landing-buttons { display: flex; gap: 20px; }
-        .landing-btn { padding: 15px 40px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; font-family: 'Montserrat', sans-serif; }
+        .landing-title { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--accent); font-size: 70px; margin: 0; text-shadow: 0 0 30px rgba(0,229,255,0.6); }
+        .landing-subtitle { color: #fff; font-size: 22px; margin-top: 10px; margin-bottom: 50px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+        .landing-buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .landing-btn { padding: 15px 35px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; font-family: 'Montserrat', sans-serif; }
         .btn-login { background: var(--accent); color: #000; }
         .btn-login:hover { background: #00b8cc; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,229,255,0.2); }
         .btn-signup { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
         .btn-signup:hover { background: rgba(0, 229, 255, 0.1); transform: translateY(-3px); }
+        .btn-guest { background: #333; border: 1px solid #555; color: #fff; }
+        .btn-guest:hover { background: #444; transform: translateY(-3px); }
 
-        .navbar { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--panel); border-radius: 12px; box-sizing: border-box; margin-bottom: 20px; border: 1px solid #333; flex-wrap: wrap; gap: 10px; }
+        .navbar { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(30, 30, 36, 0.9); backdrop-filter: blur(10px); border-radius: 12px; box-sizing: border-box; margin-bottom: 20px; border: 1px solid #333; flex-wrap: wrap; gap: 10px; }
         .nav-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); }
         .nav-user { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
         .nav-user img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--accent); }
@@ -54,7 +74,6 @@
         .showcase-btn { background: #ff0000; border: none; color: #fff; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; }
         .logout-btn { background: transparent; border: 1px solid #ff5252; color: #ff5252; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
 
-        /* 🚀 EMAIL AUTH FORM STYLES */
         .auth-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .auth-input { width: 100%; padding: 12px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; font-size: 16px; }
         .auth-submit-btn { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
@@ -73,18 +92,26 @@
 
         .dashboard { width: 100%; max-width: 800px; }
         .platform-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-        .platform-card { background: var(--panel); padding: 30px; border-radius: 16px; width: 200px; text-align: center; cursor: pointer; border: 2px solid #333; transition: 0.3s; }
-        .platform-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .platform-card { background: rgba(30, 30, 36, 0.95); padding: 30px; border-radius: 16px; width: 200px; text-align: center; cursor: pointer; border: 2px solid #333; transition: 0.3s; backdrop-filter: blur(5px); }
+        .platform-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,229,255,0.1); }
         
         .platform-logo { width: 85px; height: 85px; margin-bottom: 15px; object-fit: contain; display: inline-block; vertical-align: middle; filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.5)); }
         
         .platform-card h3 { margin: 0; font-family: 'Montserrat', sans-serif; }
 
         .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
-        .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; }
+        .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        .add-btn:hover { transform: scale(1.1); }
         
-        .leaderboard-list { width: 100%; background: var(--panel); border-radius: 12px; padding: 10px; box-sizing: border-box; }
-        .lb-card { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; background: #15151a; border: 1px solid #333; cursor: pointer; }
+        /* 🔍 SEARCH BAR STYLES */
+        .search-container { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
+        .search-input { flex: 1; padding: 12px; background: rgba(30, 30, 36, 0.9); border: 1px solid #333; color: white; border-radius: 8px; font-family: 'Roboto', sans-serif; font-size: 16px; backdrop-filter: blur(10px); }
+        .search-btn { padding: 12px 20px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .search-btn:hover { background: #00b8cc; }
+
+        .leaderboard-list { width: 100%; background: rgba(30, 30, 36, 0.9); backdrop-filter: blur(10px); border-radius: 12px; padding: 10px; box-sizing: border-box; border: 1px solid #333; }
+        .lb-card { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; background: #15151a; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
+        .lb-card:hover { transform: scale(1.01); border-color: var(--accent); }
         .lb-card.rank-1 { background: rgba(255, 215, 0, 0.1); border: 2px solid var(--gold); }
         
         .lb-card.dev-card { background: rgba(0, 229, 255, 0.1); border: 2px solid var(--accent); }
@@ -115,11 +142,14 @@
         .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; }
         .music-toggle { position: absolute; top: 30px; left: 40px; background: #ff5252; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .seo-footer { width: 100%; max-width: 800px; margin-top: 40px; margin-bottom: 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 20px; border-top: 1px solid #333; }
+        .seo-footer { width: 100%; max-width: 800px; margin-top: 40px; margin-bottom: 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
         .seo-footer h1 { font-size: 16px; color: var(--text); }
     </style>
 </head>
 <body>
+
+    <!-- 🎨 GAMING BACKGROUND -->
+    <div class="bg-container"></div>
 
     <audio id="funkPlayer" loop preload="auto"></audio>
 
@@ -132,6 +162,7 @@
             <div class="landing-buttons">
                 <button class="landing-btn btn-login" onclick="openAuthModal('login')">Log In</button>
                 <button class="landing-btn btn-signup" onclick="openAuthModal('signup')">Sign Up</button>
+                <button class="landing-btn btn-guest" onclick="enterAsGuest()">Enter as Guest</button>
             </div>
         </div>
     </div>
@@ -141,7 +172,6 @@
         <div class="modal" style="text-align: center;">
             <h2 id="auth-modal-title">Log In</h2>
             
-            <!-- 📧 CUSTOM EMAIL/PASSWORD AUTH -->
             <div class="auth-input-group">
                 <input type="text" id="auth-email" class="auth-input" placeholder="Username or Email">
                 <input type="password" id="auth-password" class="auth-input" placeholder="Password">
@@ -241,7 +271,7 @@
             </div>
             
             <div class="seo-footer">
-                <h1>AuraCard: The #1 Free Gaming Aura Card Generator</h1>
+                <h1>AuraCard: The #1 Gaming Profile & Stat Card Maker</h1>
                 <p>AuraCard is the ultimate gaming profile brand. Create and download free stat cards for <b>Roblox</b> (games like Rivals), <b>Minecraft Java</b>, <b>Minecraft Bedrock</b>, and <b>YouTube</b>. Track your Gamer Aura score, show off your blocks mined, mobs killed, and diamond counts, and compete on the global leaderboard.</p>
                 <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Built by Dano (11) using HTML, Python, and Firebase. AI was used as a coding co-pilot to help learn and squash bugs!</p>
             </div>
@@ -260,9 +290,17 @@
             </div>
         </div>
         <div class="platform-view" style="width: 100%; max-width: 800px;">
+            
+            <!-- 🔍 SEARCH BAR -->
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search a username to view their card...">
+                <button class="search-btn" onclick="searchUser()">Search</button>
+            </div>
+
             <div class="top-bar">
                 <h2 style="font-family: 'Montserrat'; margin: 0;" id="platform-leaderboard-title">Top Aura Farmers</h2>
-                <button class="add-btn" id="openCreateModal">+</button>
+                <!-- 🚫 Guest Notice -->
+                <button class="add-btn" id="openCreateModal" onclick="checkIfGuest()">+</button>
             </div>
             <div class="leaderboard-list" id="leaderboard-content"><p style="text-align: center; color: var(--muted);">Loading...</p></div>
         </div>
@@ -341,6 +379,7 @@
         const DEV_USERNAMES = ["dano", "danoblox491", "dano-dev"];
 
         let currentPlatform = ""; let currentUser = null; let validatedUsername = "";
+        let isGuest = false; // 👤 Guest Mode Flag
         window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
         const funkPlayer = document.getElementById('funkPlayer');
         const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
@@ -351,6 +390,27 @@
 
         function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
         function goToDashboard() { showScreen('dashboard-screen'); }
+
+        // 👤 GUEST LOGIC
+        function enterAsGuest() {
+            isGuest = true;
+            currentUser = { displayName: "Guest", email: "guest@auracard.user", isGuest: true, photoURL: "https://via.placeholder.com/35" };
+            document.getElementById('user-name').innerText = "Guest";
+            document.getElementById('user-avatar').src = "https://via.placeholder.com/35";
+            showScreen('dashboard-screen');
+        }
+
+        function checkIfGuest() {
+            if (isGuest) {
+                alert("You are browsing as a Guest. Please Log In or Sign Up to generate your own AuraCards!");
+                return;
+            }
+            document.getElementById('create-modal').classList.add('active');
+            document.getElementById('validation-error').style.display = 'none';
+            document.getElementById('input-username').value = "";
+            window.realData = null;
+            window.generatedCardData = null;
+        }
 
         // 🔐 AUTH MODAL & LOGIC
         let isSignUpMode = false;
@@ -385,7 +445,6 @@
 
             if (!email || !password) return alert("Please fill in both fields!");
 
-            // 🛠️ SECRET TRICK: If they don't type an @, treat it as a username and add fake email domain
             if (!email.includes('@')) {
                 email = email + '@auracard.user';
             }
@@ -399,6 +458,7 @@
                 } else {
                     await auth.signInWithEmailAndPassword(email, password);
                 }
+                isGuest = false;
                 closeAuthModal();
             } catch (error) {
                 alert("Error: " + error.message);
@@ -411,17 +471,17 @@
         
         function selectPlatform(platform) { currentPlatform = platform; const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' }; document.getElementById('platform-title').innerText = titleMap[platform]; document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`; if (platform === 'roblox') { document.getElementById('roblox-inputs').style.display = 'block'; } else { document.getElementById('roblox-inputs').style.display = 'none'; } showScreen('platform-screen'); loadLeaderboard(platform); }
         
-        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
+        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; isGuest = false; closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
         
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
         document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
         document.getElementById('microsoftLoginBtn').addEventListener('click', () => loginWithProvider('microsoft'));
         document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
-        document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; showScreen('login-screen'); });
+        document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; isGuest = false; showScreen('login-screen'); });
 
         function showSupportSoon() { alert("☕ The donation page is being set up and will be live tomorrow! Thank you for wanting to support AuraCard! 👑"); }
 
-        function openFeedbackModal() { document.getElementById('feedback-modal').classList.add('active'); if(currentUser && currentUser.email) { document.getElementById('feedback-email').value = currentUser.email; } }
+        function openFeedbackModal() { document.getElementById('feedback-modal').classList.add('active'); if(currentUser && currentUser.email && !isGuest) { document.getElementById('feedback-email').value = currentUser.email; } }
         function closeFeedbackModal() { document.getElementById('feedback-modal').classList.remove('active'); document.getElementById('feedback-text').value = ''; }
 
         async function submitFeedback() {
@@ -431,13 +491,13 @@
             
             const btn = document.getElementById('submit-feedback-btn'); btn.innerText = "Sending..."; btn.disabled = true;
             try {
-                await db.collection('feedback').add({ user: currentUser ? (currentUser.displayName || currentUser.email) : "Anonymous", email: email, uid: currentUser ? currentUser.uid : "none", message: text, timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: false });
+                await db.collection('feedback').add({ user: isGuest ? "Guest" : (currentUser.displayName || currentUser.email), email: email, uid: currentUser ? currentUser.uid : "guest", message: text, timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: false });
                 btn.innerText = "✅ Sent!"; setTimeout(() => { closeFeedbackModal(); btn.innerText = "Send"; btn.disabled = false; }, 2000);
             } catch(e) { alert("Failed to send: " + e.message); btn.innerText = "Send"; btn.disabled = false; }
         }
 
         function openAdminModal() {
-            if (!ADMIN_EMAILS.includes(currentUser.email)) return alert("Only Dano can access this!");
+            if (isGuest || !ADMIN_EMAILS.includes(currentUser.email)) return alert("Only Dano can access this!");
             document.getElementById('admin-modal').classList.add('active');
             const list = document.getElementById('admin-feedback-list');
             list.innerHTML = '<p style="color:var(--muted);">Loading feedback...</p>';
@@ -470,7 +530,6 @@
             } catch(e) { alert("Error: " + e.message); }
         }
 
-        document.getElementById('openCreateModal').addEventListener('click', () => { document.getElementById('create-modal').classList.add('active'); document.getElementById('validation-error').style.display = 'none'; document.getElementById('input-username').value = ""; window.realData = null; window.generatedCardData = null; });
         function closeModal() { document.getElementById('create-modal').classList.remove('active'); }
         function closeViewer() { funkPlayer.pause(); updateMusicUI(false); document.getElementById('card-viewer').classList.remove('active'); document.getElementById('large-preview').style.display = 'none'; document.getElementById('upload-success').style.display = 'none'; document.getElementById('uploadBtn').style.display = 'block'; document.getElementById('shareBtn').style.display = 'none'; }
         
@@ -521,8 +580,31 @@
         function loadImage(url) { return new Promise((resolve) => { const img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = url; }); }
 
         document.getElementById('downloadBtn').addEventListener('click', () => { if (!window.generatedCardData) return; const link = document.createElement('a'); link.download = `${window.generatedCardData.username}_AuraCard.jpg`; link.href = window.generatedCardData.image; link.click(); });
-        document.getElementById('uploadBtn').addEventListener('click', async () => { if (!window.generatedCardData || !db || !currentUser) return; const btn = document.getElementById('uploadBtn'); btn.innerText = "Uploading..."; btn.disabled = true; try { const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`; await db.collection('auracards').doc(uniqueDocId).set({ user: currentUser.uid, platform: window.generatedCardData.platform, username: window.generatedCardData.username, wins: window.generatedCardData.level, bio: window.generatedCardData.bio, image: window.generatedCardData.image, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); document.getElementById('upload-success').style.display = 'block'; btn.innerText = "✅ Uploaded!"; document.getElementById('shareBtn').style.display = 'flex'; setTimeout(() => { closeViewer(); loadLeaderboard(currentPlatform); }, 2500); } catch(e) { alert("Upload failed: " + e.message); btn.innerText = "🚀 Upload"; btn.disabled = false; } });
+        document.getElementById('uploadBtn').addEventListener('click', async () => { 
+            if (isGuest) return alert("Guests cannot upload cards! Please log in.");
+            if (!window.generatedCardData || !db || !currentUser) return; const btn = document.getElementById('uploadBtn'); btn.innerText = "Uploading..."; btn.disabled = true; try { const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`; await db.collection('auracards').doc(uniqueDocId).set({ user: currentUser.uid, platform: window.generatedCardData.platform, username: window.generatedCardData.username, wins: window.generatedCardData.level, bio: window.generatedCardData.bio, image: window.generatedCardData.image, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); document.getElementById('upload-success').style.display = 'block'; btn.innerText = "✅ Uploaded!"; document.getElementById('shareBtn').style.display = 'flex'; setTimeout(() => { closeViewer(); loadLeaderboard(currentPlatform); }, 2500); } catch(e) { alert("Upload failed: " + e.message); btn.innerText = "🚀 Upload"; btn.disabled = false; } });
+        
         document.getElementById('shareBtn').addEventListener('click', async () => { if (!window.generatedCardData) return; const shareData = { title: 'AuraCard', text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`, url: 'https://auracard.isroot.in' }; try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`); alert("Link copied!"); } } catch (err) {} });
+
+        // 🔍 SEARCH FUNCTIONALITY
+        async function searchUser() {
+            const searchTerm = document.getElementById('search-input').value.trim().toLowerCase();
+            if (!searchTerm) return alert("Please enter a username to search!");
+
+            const docId = `${currentPlatform}_${searchTerm}`;
+            try {
+                const doc = await db.collection('auracards').doc(docId).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    window.leaderboardCache[doc.id] = data;
+                    viewLeaderboardCard(doc.id);
+                } else {
+                    alert("auracard not generated go signin or login and generate");
+                }
+            } catch (e) {
+                alert("Error searching: " + e.message);
+            }
+        }
 
         function loadLeaderboard(platform) {
             const list = document.getElementById('leaderboard-content'); list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`; if (!db) return;
@@ -561,11 +643,13 @@
         }
 
         auth.onAuthStateChanged((user) => {
+            if (isGuest) return; // Ignore firebase auth if user intentionally clicked "Guest"
+            
             if (user) {
                 currentUser = user; 
                 let displayName = user.displayName;
                 if (!displayName && user.email) {
-                    displayName = user.email.split('@')[0]; // If they used a username, show that
+                    displayName = user.email.split('@')[0];
                 }
                 document.getElementById('user-name').innerText = displayName || "Gamer"; 
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
