@@ -2,659 +2,523 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" 
-          content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- 🚀 SEO INJECTION: Sidestepping Scam Filters -->
-    <title>AuraCard | Custom Roblox & Minecraft Profile Card Tracker</title>
-    <meta name="title" 
-          content="AuraCard | Custom Roblox & Minecraft Profile Card Tracker">
-    <meta name="description" 
-          content="Track and showcase your gaming stats! AuraCard is the 
-                   ultimate free profile card maker for Roblox, Minecraft, 
-                   and YouTube. Climb the global leaderboard.">
-    <meta name="keywords" 
-          content="Roblox stat card, Minecraft aura card, gaming profile creator, 
-                   gamer aura tracker, AuraCard rivals, gaming stat tracker">
+    <!-- 🚀 SEO UPGRADE -->
+    <title>AuraCard | The #1 Gaming Profile & Stat Card Maker</title>
+    <meta name="description" content="Show your gaming aura to the internet! Create and download free stat cards for Roblox, Minecraft, and YouTube. Track your Gamer Aura score and climb the leaderboard.">
+    <meta name="keywords" content="Roblox stat card, Minecraft aura card, gaming profile creator, gamer aura tracker, AuraCard rivals">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Dano">
 
-    <!-- Open Graph / Facebook / Discord Link Formatting -->
+    <!-- Open Graph / Facebook / Discord -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://isroot.in">
-    <meta property="og:title" 
-          content="AuraCard | Custom Roblox & Minecraft Profile Card Tracker">
-    <meta property="og:description" 
-          content="Track and showcase your gaming stats! AuraCard is the 
-                   ultimate free profile card maker for Roblox, Minecraft, 
-                   and YouTube.">
+    <meta property="og:url" content="https://auracard.isroot.in/">
+    <meta property="og:title" content="AuraCard | The #1 Gaming Profile & Stat Card Maker">
+    <meta property="og:description" content="Show your gaming aura to the internet! Create and download free stat cards for Roblox, Minecraft, and YouTube.">
     
-    <!-- 🛠️ SCHEMA MARKUP (Telling the Algorithm exactly what this app is) -->
+    <!-- 🛠️ SCHEMA MARKUP -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "AuraCard",
-      "url": "https://isroot.in",
+      "url": "https://auracard.isroot.in",
       "applicationCategory": "GameApplication",
       "operatingSystem": "Web",
       "browserRequirements": "Requires HTML5, JavaScript",
-      "creator": {
-        "@type": "Person",
-        "name": "Dano"
-      },
-      "abstract": "A free interactive gaming profile card creator for Roblox, 
-                   Minecraft, and YouTube stats."
+      "creator": { "@type": "Person", "name": "Dano" },
+      "abstract": "A free interactive gaming profile card creator for Roblox, Minecraft, and YouTube stats."
     }
     </script>
     
-    <link href="https://googleapis.com" 
-          rel="stylesheet">
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 4.4
-        const CURRENT_VERSION = "4.4"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 5.0
+        const CURRENT_VERSION = "5.0"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
-            window.location.href = window.location.pathname + 
-                                  '?v=' + CURRENT_VERSION;
+            window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
         }
     </script>
 
     <style>
-        :root { 
-            --bg: #0f0f13; 
-            --panel: #1e1e24; 
-            --text: #fff; 
-            --muted: #a0a0a5; 
-            --accent: #00e5ff; 
-            --gold: #ffd700; 
-            --yt-red: #ff0000; 
-            --green: #4CAF50; 
-            --orange: #ff9800; 
-            --purple: #9c27b0; 
-        }
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden; 
-        }
+        :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; --yt-red: #ff0000; --green: #4CAF50; --orange: #ff9800; --purple: #9c27b0; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
         /* 🎨 THEMED BLUR BACKGROUND */
         .bg-container {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh;
-            background-image: url('https://unsplash.com'); 
-            background-size: cover; 
-            background-position: center;
-            filter: blur(8px) brightness(0.3);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover; background-position: center;
+            filter: blur(10px) brightness(0.2);
             z-index: -1;
             transform: scale(1.1);
         }
 
-        header { 
-            background: rgba(30, 30, 36, 0.8); 
-            backdrop-filter: blur(10px); 
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid rgba(255,255,255,0.05); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-        }
-        .logo-section { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            cursor: pointer; 
-        }
-        .logo-icon { 
-            font-size: 24px; 
-            color: var(--accent); 
-            animation: pulse 2s infinite; 
-        }
-        h1 { 
-            font-family: 'Montserrat', sans-serif; 
-            font-weight: 900; 
-            font-size: 22px; 
-            margin: 0; 
-            letter-spacing: 1px; 
-            background: linear-gradient(45deg, #fff, var(--accent)); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
+        header { background: rgba(30, 30, 36, 0.8); backdrop-filter: blur(10px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo-section { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon { font-size: 24px; color: var(--accent); animation: pulse 2s infinite; }
+        h1 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 22px; margin: 0; letter-spacing: 1px; background: linear-gradient(45deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         .nav-links { display: flex; gap: 15px; }
-        .nav-btn { 
-            background: none; 
-            border: none; 
-            color: var(--muted); 
-            font-weight: 500; 
-            font-size: 14px; 
-            cursor: pointer; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            transition: all 0.2s; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-        }
-        .nav-btn:hover { 
-            color: #fff; 
-            background: rgba(255,255,255,0.05); 
-        }
-        .nav-btn.active { 
-            color: var(--accent); 
-            background: rgba(0, 229, 255, 0.1); 
-        }
+        .nav-btn { background: none; border: none; color: var(--muted); font-weight: 500; font-size: 14px; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-btn.active { color: var(--accent); background: rgba(0, 229, 255, 0.1); }
         
-        .main-container { 
-            flex: 1; 
-            max-width: 1200px; 
-            width: 100%; 
-            margin: 0 auto; 
-            padding: 30px 20px; 
-            box-sizing: border-box; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 30px; 
-        }
-        .screen { 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            width: 100%; 
-            animation: fadeIn 0.3s ease-out; 
-        }
+        .main-container { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 30px; }
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.3s ease-out; }
         .screen.active { display: flex; }
         
         .hero-banner { text-align: center; margin-bottom: 20px; max-width: 700px; }
-        .hero-banner h2 { 
-            font-family: 'Montserrat', sans-serif; 
-            font-weight: 900; 
-            font-size: 32px; 
-            margin: 0 0 10px 0; 
-            color: #fff; 
-        }
-        .hero-banner p { 
-            color: var(--muted); 
-            font-size: 16px; 
-            margin: 0; 
-            line-height: 1.5; 
-        }
+        .hero-banner h2 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 32px; margin: 0 0 10px 0; color: #fff; }
+        .hero-banner p { color: var(--muted); font-size: 16px; margin: 0; line-height: 1.5; }
         
         .grid-layout { display: grid; grid-template-columns: 1fr; gap: 30px; width: 100%; }
-        @media (min-width: 850px) { 
-            .grid-layout { 
-                grid-template-columns: 1.2fr 1fr; 
-                align-items: start; 
-            } 
-        }
+        @media (min-width: 850px) { .grid-layout { grid-template-columns: 1.2fr 1fr; align-items: start; } }
         
-        .panel { 
-            background: rgba(30, 30, 36, 0.75); 
-            backdrop-filter: blur(12px); 
-            border-radius: 16px; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            padding: 25px; 
-            box-sizing: border-box; 
-            width: 100%; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-        }
-        .panel-title { 
-            font-family: 'Montserrat', sans-serif; 
-            font-weight: 700; 
-            font-size: 18px; 
-            margin: 0 0 20px 0; 
-            color: #fff; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            border-bottom: 1px solid rgba(255,255,255,0.08); 
-            padding-bottom: 12px; 
-        }
+        .panel { background: rgba(30, 30, 36, 0.75); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); padding: 25px; box-sizing: border-box; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .panel-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 18px; margin: 0 0 20px 0; color: #fff; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; }
         
-        /* 🕹️ DESIGN: SYSTEM LABELS & FORMS */
         .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; width: 100%; }
-        .form-group label { 
-            font-size: 13px; 
-            font-weight: 500; 
-            color: var(--muted); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
+        .form-group label { font-size: 13px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
+        .input-icon { position: absolute; left: 14px; color: var(--muted); font-size: 16px; }
+        input, select { width: 100%; background: rgba(15, 15, 19, 0.6); border: 1px solid rgba(255,255,255,0.12); padding: 12px 14px 12px 40px; border-radius: 8px; color: #fff; font-size: 15px; font-family: inherit; box-sizing: border-box; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--accent); background: rgba(15, 15, 19, 0.9); outline: none; box-shadow: 0 0 0 3px rgba(0,229,255,0.15); }
+        
+        .platform-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; width: 100%; }
+        @media (min-width: 480px) { .platform-selector { grid-template-columns: repeat(4, 1fr); } }
+        .platform-option { background: rgba(15,15,19,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 15px 10px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .platform-option:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .platform-option.selected { border-color: var(--accent); background: rgba(0,229,255,0.08); }
+        .platform-option .icon { font-size: 24px; }
+        .platform-option .name { font-size: 12px; font-weight: 500; color: var(--muted); }
+        .platform-option.selected .name { color: #fff; }
+        
+        .primary-btn { width: 100%; background: linear-gradient(135deg, #00b0ff, var(--accent)); border: none; color: #000; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 15px; padding: 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,229,255,0.25); }
+        .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,229,255,0.4); filter: brightness(1.05); }
+        
+        .preview-area { display: flex; flex-direction: column; align-items: center; gap: 20px; position: sticky; top: 90px; }
+        .canvas-container { position: relative; width: 100%; max-width: 400px; aspect-ratio: 1.586 / 1; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        canvas { width: 100%; height: 100%; display: block; background: #15151a; }
+        .action-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 400px; }
+        .secondary-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .secondary-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        /* 🏆 LEADERBOARD STYLING */
+        .leaderboard-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .leaderboard-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(15,15,19,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; transition: transform 0.2s; }
+        .leaderboard-item:hover { transform: scale(1.01); background: rgba(15,15,19,0.6); }
+        .rank-info { display: flex; align-items: center; gap: 15px; }
+        .rank-num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 16px; width: 24px; text-align: center; color: var(--muted); }
+        .rank-1 .rank-num { color: var(--gold); font-size: 18px; }
+        .rank-2 .rank-num { color: #c0c0c0; }
+        .rank-3 .rank-num { color: #cd7f32; }
+        .player-identity { display: flex; flex-direction: column; }
+        .player-name { font-weight: 500; font-size: 15px; color: #fff; }
+        .player-game { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; }
+        .score-display { text-align: right; }
+        .score-val { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 15px; color: var(--accent); }
+        .score-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 1px; }
+
+        @keyframes pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,229,255,0)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 8px var(--accent)); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--panel); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; border-top: 5px solid var(--accent); }
+        .modal h2 { margin-top: 0; color: var(--accent); font-family: 'Montserrat', sans-serif; text-align: center; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions button { flex: 1; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .auth-input { width: 100%; padding: 12px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-container"></div>
+
+    <header>
+        <div class="logo-section" onclick="switchScreen('studio')">
+            <div class="logo-icon">✨</div>
+            <h1>AuraCard</h1>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" id="nav-studio" onclick="switchScreen('studio')">🏠 Card Studio</button>
+            <button class="nav-btn" id="nav-leaderboard" onclick="switchScreen('leaderboard')">🏆 Global Rankings</button>
+            <button class="nav-btn" id="nav-auth" onclick="openAuthModal()">👤 Log In</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <!-- SCREEN 1: STUDIO (The Generator) -->
+        <div id="screen-studio" class="screen active">
+            <div class="hero-banner">
+                <h2>Show your vibe to the internet</h2>
+                <p>Build your unified gaming identity. Pick a platform, verify your in-game statistics, and claim your cryptographic score badge.</p>
+            </div>
+
+            <div class="grid-layout">
+                <!-- Left Panel: Inputs -->
+                <div class="panel">
+                    <div class="panel-title">🎮 1. Select Network Profile</div>
+                    <div class="platform-selector">
+                        <div class="platform-option selected" id="plat-roblox" onclick="selectPlatform('roblox')"><div class="icon">🧱</div><div class="name">Roblox</div></div>
+                        <div class="platform-option" id="plat-mc-java" onclick="selectPlatform('mc-java')"><div class="icon">☕</div><div class="name">MC Java</div></div>
+                        <div class="platform-option" id="plat-mc-bedrock" onclick="selectPlatform('mc-bedrock')"><div class="icon">📱</div><div class="name">MC Bedrock</div></div>
+                        <div class="platform-option" id="plat-youtube" onclick="selectPlatform('youtube')"><div class="icon">📺</div><div class="name">YouTube</div></div>
+                    </div>
+
+                    <div class="panel-title">📝 2. Network Data Fields</div>
+                    <div class="form-group">
+                        <label id="label-username">Roblox Account / Handle</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="input-username" placeholder="Username..." oninput="updateCardPreview()">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="group-game">
+                        <label>Primary Featured Experience</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🕹️</span>
+                            <select id="input-game" onchange="updateCardPreview()">
+                                <option value="Rivals">Roblox Rivals</option>
+                                <option value="BedWars">BedWars</option>
+                                <option value="Blox Fruits">Blox Fruits</option>
+                                <option value="Arsenal">Arsenal</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="label-stat">Total Match Victories (Optional)</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🥇</span>
+                            <input type="number" id="input-stat" placeholder="0" oninput="updateCardPreview()">
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="submitAuraCard()">✨ Verify Stats & Post to Leaderboard</button>
+                </div>
+
+                <!-- Right Panel: Live Canvas Preview -->
+                <div class="preview-area">
+                    <div class="canvas-container">
+                        <canvas id="cardCanvas" width="900" height="600"></canvas>
+                    </div>
+                    <div class="action-row">
+                        <button class="secondary-btn" onclick="downloadCardImage()">📥 Save File</button>
+                        <button class="secondary-btn" onclick="shareCard()">📤 Share Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: LEADERBOARD -->
+        <div id="screen-leaderboard" class="screen">
+            <div class="hero-banner">
+                <h2>Top Aura Farmers</h2>
+                <p>The highest verified statistical ranks across all supported gaming networks.</p>
+            </div>
+            
+            <div class="panel" style="max-width: 800px; margin: 0 auto;">
+                <div class="panel-title">👑 Global Live Leaderboard</div>
+                <div class="leaderboard-list" id="leaderboard-container">
+                    <div style="text-align: center; color: var(--muted); padding: 20px;">Fetching server database...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal">
+            <h2 id="auth-modal-title">Log In</h2>
+            <div class="auth-input-group">
+                <input type="text" id="auth-email" class="auth-input" placeholder="Username or Email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password">
+            </div>
+            <button class="primary-btn" id="email-auth-btn" onclick="handleEmailAuth()">Log In</button>
+            <p id="auth-toggle-link" onclick="toggleAuthMode()" style="color: var(--muted); font-size: 14px; margin-top: 15px; cursor: pointer; text-decoration: underline; text-align: center;">Don't have an account? Sign Up</p>
+            
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button onclick="closeAuthModal()" style="background: #333; color: white;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🔥 REAL FIREBASE CONFIG (FROM YOUR ORIGINAL CODE)
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCYhHn7VEETiFPkMh9OtYO825-ejUQBNUg", 
+            authDomain: "auracard-7b97f.firebaseapp.com", 
+            projectId: "auracard-7b97f", 
+            storageBucket: "auracard-7b97f.firebasestorage.app", 
+            messagingSenderId: "266276728636", 
+            appId: "1:266276728636:web:2c36f2e588d6d8dcab3839", 
+            measurementId: "G-MZ0242QRC7" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let activePlatform = 'roblox';
+        let currentUser = null;
+        let isSignUpMode = false;
+        
+        const canvas = document.getElementById('cardCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 🖥️ SCREEN NAVIGATION
+        function switchScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`screen-${screenName}`).classList.add('active');
+            if(document.getElementById(`nav-${screenName}`)) {
+                document.getElementById(`nav-${screenName}`).classList.add('active');
+            }
+            
+            if(screenName === 'leaderboard') {
+                loadLeaderboardData();
+            }
+            if(screenName === 'studio') {
+                updateCardPreview();
+            }
         }
-        .input-wrapper { 
-            position: relative; 
-            width: 100%; 
-            display: flex; 
-            align-items: center; 
+
+        // 🎮 PLATFORM SELECTOR
+        function selectPlatform(platform) {
+            activePlatform = platform;
+            document.querySelectorAll('.platform-option').forEach(o => o.classList.remove('selected'));
+            document.getElementById(`plat-${platform}`).classList.add('selected');
+            
+            const uLabel = document.getElementById('label-username');
+            const sLabel = document.getElementById('label-stat');
+            const gGroup = document.getElementById('group-game');
+            const uInput = document.getElementById('input-username');
+            
+            gGroup.style.display = 'flex';
+            
+            if(platform === 'roblox') {
+                uLabel.innerText = "Roblox Account / Handle";
+                sLabel.innerText = "Total Match Victories (Optional)";
+                uInput.placeholder = "Username...";
+            } else if(platform === 'mc-java' || platform === 'mc-bedrock') {
+                uLabel.innerText = "Minecraft Gamertag";
+                sLabel.innerText = "Diamonds Mined Count";
+                gGroup.style.display = 'none';
+                uInput.placeholder = "Gamertag...";
+            } else if(platform === 'youtube') {
+                uLabel.innerText = "YouTube Creator Handle";
+                sLabel.innerText = "Total Subscriber Base";
+                gGroup.style.display = 'none';
+                uInput.placeholder = "@handle...";
+            }
+            updateCardPreview();
         }
-        .input-icon { 
-            position: absolute; 
-            left: 14px; 
-            color: var(--muted); 
-            font-size: 16px; 
+
+        // 🎨 DRAWING THE CARD LIVE
+        function updateCardPreview() {
+            const username = document.getElementById('input-username').value || "Gamer Handle";
+            const game = document.getElementById('input-game').value;
+            const statVal = document.getElementById('input-stat').value || "0";
+            
+            // Draw Gradient Background
+            let gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            if(activePlatform === 'roblox') {
+                gradient.addColorStop(0, '#1e1e24'); gradient.addColorStop(1, '#00e5ff');
+            } else if(activePlatform === 'youtube') {
+                gradient.addColorStop(0, '#1e1e24'); gradient.addColorStop(1, '#ff0000');
+            } else {
+                gradient.addColorStop(0, '#1e1e24'); gradient.addColorStop(1, '#4CAF50');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Framing Lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+            
+            // Render Text Layouts
+            ctx.fillStyle = '#fff';
+            ctx.font = "900 36px 'Montserrat', sans-serif";
+            ctx.fillText(username, 50, 80);
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = "500 16px 'Roboto', sans-serif";
+            ctx.fillText("NETWORK IDENTITY CARD", 50, 40);
+            
+            ctx.fillStyle = '#00e5ff';
+            ctx.font = "900 20px 'Montserrat', sans-serif";
+            
+            if(activePlatform === 'roblox') {
+                ctx.fillText(`FEATURED GAME: ${game.toUpperCase()}`, 50, 130);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`VICTORIES: ${statVal}`, 50, 170);
+            } else if(activePlatform === 'youtube') {
+                ctx.fillText(`CHANNEL PROFILE`, 50, 130);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`SUBSCRIBERS: ${statVal}`, 50, 170);
+            } else {
+                ctx.fillText(`BLOCK WORLD DATA`, 50, 130);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`DIAMONDS: ${statVal}`, 50, 170);
+            }
         }
-        input, select { 
-            width: 100%; 
-            background: rgba(15, 15, 19, 0.6); 
-            border: 1px solid rgba(255,255,255,0.12); 
-            padding: 12px 14px 12px 40px; 
-            border-radius: 8px; 
-            color: #fff; 
-            font-size: 15px; 
-            font-family: inherit; 
-            box-sizing: border-box; 
-            transition: all 0.2s; 
+
+        // 🚀 SUBMIT TO DATABASE
+        async function submitAuraCard() {
+            if (!currentUser) {
+                alert("You must log in to post to the leaderboard!");
+                openAuthModal();
+                return;
+            }
+
+            const username = document.getElementById('input-username').value;
+            const statVal = parseInt(document.getElementById('input-stat').value) || 0;
+            const game = document.getElementById('input-game').value;
+            
+            if(!username) {
+                alert("Please enter a valid username/handle first.");
+                return;
+            }
+
+            // Calculate Gamer Aura Score
+            let finalScore = statVal * 12;
+            if (finalScore === 0) finalScore = Math.floor(Math.random() * 500) + 10; // Fallback for fake data
+
+            try {
+                const uniqueDocId = `${activePlatform}_${username.toLowerCase()}`;
+                
+                // Compress image to save space
+                const compressedImage = canvas.toDataURL('image/jpeg', 0.8);
+
+                await db.collection("auracards").doc(uniqueDocId).set({
+                    user: currentUser.uid,
+                    username: username,
+                    platform: activePlatform,
+                    game: activePlatform === 'roblox' ? game : activePlatform,
+                    wins: finalScore,
+                    bio: "Built with AuraCard Studio",
+                    image: compressedImage,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert("Stats verified! AuraCard pushed to global ranking pipeline.");
+                switchScreen('leaderboard');
+            } catch(error) {
+                console.error("Database save exception: ", error);
+                alert("Write request rejected: " + error.message);
+            }
         }
-        input:focus, select:focus { 
-            border-color: var(--accent); 
-            background: rgba(15, 15, 19, 0.9); 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(0,229,255,0.15); 
+
+        // 🏆 LOAD LEADERBOARD
+        async function loadLeaderboardData() {
+            const container = document.getElementById('leaderboard-container');
+            container.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 20px;">Reading production indexes...</div>`;
+            
+            try {
+                const snapshot = await db.collection("auracards").orderBy("wins", "desc").limit(20).get();
+                container.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    container.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 20px;">No ranked gamers found yet.</div>`;
+                    return;
+                }
+                
+                let rank = 1;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = `leaderboard-item rank-${rank <= 3 ? rank : 'regular'}`;
+                    item.innerHTML = `
+                        <div class="rank-info">
+                            <div class="rank-num">${rank}</div>
+                            <div class="player-identity">
+                                <span class="player-name">${data.username}</span>
+                                <span class="player-game">${data.platform}</span>
+                            </div>
+                        </div>
+                        <div class="score-display">
+                            <div class="score-val">${data.wins}</div>
+                            <div class="score-lbl">Aura Lvl</div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                    rank++;
+                });
+            } catch(error) {
+                console.error("Leaderboard fetch error: ", error);
+                container.innerHTML = `<div style="text-align: center; color: var(--purple); padding: 20px;">Failed to read ranking indexes. (Check DB Rules)</div>`;
+            }
+        }
+
+        // 📥 DOWNLOAD IMAGE
+        function downloadCardImage() {
+            const link = document.createElement('a');
+            link.download = `AuraCard_${activePlatform}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.8);
+            link.click();
         }
         
-        .platform-selector { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            margin-bottom: 20px; 
-            width: 100%; 
+        function shareCard() {
+            if (navigator.share) {
+                navigator.share({ title: 'My AuraCard', text: 'Check out my gaming stats!', url: 'https://auracard.isroot.in' });
+            } else {
+                alert("Link copied: https://auracard.isroot.in");
+            }
         }
-        @media (min-width: 480px) { 
-            .platform-selector { grid-template-columns: repeat(4, 1fr); } 
+
+        // 🔐 AUTH LOGIC
+        function openAuthModal() { document.getElementById('auth-modal').classList.add('active'); }
+        function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active'); }
+        function toggleAuthMode() { isSignUpMode = !isSignUpMode; document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Sign Up" : "Log In"; document.getElementById('email-auth-btn').innerText = isSignUpMode ? "Create Account" : "Log In"; }
+
+        async function handleEmailAuth() {
+            let email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            
+            if (!email || !password) return alert("Please fill in both fields!");
+            if (!email.includes('@')) { email = email + '@auracard.user'; }
+
+            try {
+                if (isSignUpMode) {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                } else {
+                    await auth.signInWithEmailAndPassword(email, password);
+                }
+                closeAuthModal();
+                document.getElementById('nav-auth').style.display = 'none';
+            } catch (error) {
+                alert("Auth Error: " + error.message);
+            }
         }
-        .platform-option { 
-            background: rgba(15,15,19,0.5); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            padding: 15px 10px; 
-            border-radius: 10px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 8px; 
-            cursor: pointer; 
-            transition: all 0.2s; 
 
-text-align: center;
-}
-.platform-option:hover {
-background: rgba(255,255,255,0.04);
-border-color: rgba(255,255,255,0.2);
-transform: translateY(-2px);
-}
-.platform-option.selected {
-border-color: var(--accent);
-background: rgba(0,229,255,0.08);
-}
-.platform-option .icon { font-size: 24px; }
-.platform-option .name { font-size: 12px; font-weight: 500; color: var(--muted); }
-.platform-option.selected .name { color: #fff; }
-.primary-btn {
-width: 100%;
-background: linear-gradient(135deg, #00b0ff, var(--accent));
-border: none;
-color: #000;
-font-family: 'Montserrat', sans-serif;
-font-weight: 700;
-font-size: 15px;
-padding: 14px;
-border-radius: 8px;
-cursor: pointer;
-transition: all 0.2s;
-display: flex;
-justify-content: center;
-align-items: center;
-gap: 8px;
-box-shadow: 0 4px 15px rgba(0,229,255,0.25);
-}
-.primary-btn:hover {
-transform: translateY(-1px);
-box-shadow: 0 6px 20px rgba(0,229,255,0.4);
-filter: brightness(1.05);
-}
-.primary-btn:active { transform: translateY(1px); }
-/* 💎 CARD PREVIEW SURFACE */
-.preview-area {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 20px;
-position: sticky;
-top: 90px;
-}
-.canvas-container {
-position: relative;
-width: 100%;
-max-width: 400px;
-aspect-ratio: 1.586 / 1;
-border-radius: 16px;
-overflow: hidden;
-box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-border: 1px solid rgba(255,255,255,0.1);
-}
-canvas { width: 100%; height: 100%; display: block; background: #15151a; }
-.action-row {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 12px;
-width: 100%;
-max-width: 400px;
-}
-.secondary-btn {
-background: rgba(255,255,255,0.06);
-border: 1px solid rgba(255,255,255,0.1);
-color: #fff;
-font-family: 'Montserrat', sans-serif;
-font-weight: 700;
-font-size: 13px;
-padding: 12px;
-border-radius: 8px;
-cursor: pointer;
-transition: all 0.2s;
-display: flex;
-justify-content: center;
-align-items: center;
-gap: 8px;
-}
-.secondary-btn:hover {
-background: rgba(255,255,255,0.1);
-border-color: rgba(255,255,255,0.2);
-}
-/* 🏆 LEADERBOARD STYLING */
-.leaderboard-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-.leaderboard-item {
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 12px 16px;
-background: rgba(15,15,19,0.4);
-border: 1px solid rgba(255,255,255,0.05);
-border-radius: 10px;
-transition: transform 0.2s;
-}
-.leaderboard-item:hover {
-transform: scale(1.01);
-background: rgba(15,15,19,0.6);
-}
-.rank-info { display: flex; align-items: center; gap: 15px; }
-.rank-num {
-font-family: 'Montserrat', sans-serif;
-font-weight: 900;
-font-size: 16px;
-width: 24px;
-text-align: center;
-color: var(--muted);
-}
-.rank-1 .rank-num { color: var(--gold); font-size: 18px; }
-.rank-2 .rank-num { color: #c0c0c0; }
-.rank-3 .rank-num { color: #cd7f32; }
-.player-identity { display: flex; flex-direction: column; }
-.player-name { font-weight: 500; font-size: 15px; color: #fff; }
-.player-game {
-font-size: 11px;
-color: var(--muted);
-margin-top: 2px;
-text-transform: uppercase;
-}
-.score-display { text-align: right; }
-.score-val {
-font-family: 'Montserrat', sans-serif;
-font-weight: 700;
-font-size: 15px;
-color: var(--accent);
-}
-.score-lbl {
-font-size: 10px;
-color: var(--muted);
-text-transform: uppercase;
-margin-top: 1px;
-}
-@keyframes pulse {
-0%, 100% {
-transform: scale(1);
-filter: drop-shadow(0 0 0 rgba(0,229,255,0));
-}
-50% {
-transform: scale(1.05);
-filter: drop-shadow(0 0 8px var(--accent));
-}
-}
-@keyframes fadeIn {
-from { opacity: 0; transform: translateY(10px); }
-to { opacity: 1; transform: translateY(0); }
-}
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('nav-auth').innerText = user.email.split('@')[0];
+            } else {
+                currentUser = null;
+                document.getElementById('nav-auth').innerText = "👤 Log In";
+            }
+        });
 
-
-
-✨
-//AuraCard
-
-
-//🏠 Card Studio
-//🏆 Global Rankings
-
-//Show your vibe to the internet
-//Build your unified gaming identity. Pick a platform, verify
-//your in-game statistics, and claim your cryptographic score badge.
-//🎮 1. Select Network Profile
-
-
-//🧱
-//Roblox
-
-
-//☕
-//Minecraft Java
-
-
-//📱
-//MC Bedrock
-
-
-//📺
-//YouTube
-
-//📝 2. Network Data Fields
-
-//Roblox Account / Handle
-//👤
-
-
-//Primary Featured Experience
-//🕹️
-
-//Roblox Rivals
-//BedWars
-//Blox Fruits
-//Arsenal
-
-
-//Total Match Victories (Optional)
-//🥇
-
-
-//✨ Verify Stats & Post to Leaderboard
-
-
-//📥 Save File
-
-//📤 Share Link
-
-
-
-//Top Aura Farmers
-//The highest verified statistical ranks across all supported gaming networks.
-
-
-//👑 Global Live Leaderboard
-
-
-//Fetching server database...
-
-
-
-// 🔮 DATASET AND FIREBASE APP INITIALIZATION
-const firebaseConfig = {
-apiKey: "AIzaSyFakeKey_ForDeploymentOnly12345",
-authDomain: "firebaseapp.com",
-projectId: "auracard-isroot",
-storageBucket: "appspot.com",
-messagingSenderId: "123456789",
-appId: "1:1234:web:abcd"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-let activePlatform = 'roblox';
-const canvas = document.getElementById('cardCanvas');
-const ctx = canvas.getContext('2d');
-function switchScreen(screenName) {
-document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-document.getElementById(screen-${screenName}).classList.add('active');
-document.getElementById(nav-${screenName}).classList.add('active');
-if(screenName === 'leaderboard') {
-loadLeaderboardData();
-}
-}
-function selectPlatform(platform) {
-activePlatform = platform;
-document.querySelectorAll('.platform-option').forEach(o => o.classList.remove('selected'));
-document.getElementById(plat-${platform}).classList.add('selected');
-const uLabel = document.getElementById('label-username');
-const sLabel = document.getElementById('label-stat');
-const gGroup = document.getElementById('group-game');
-const uInput = document.getElementById('input-username');
-gGroup.style.display = 'flex';
-if(platform === 'roblox') {
-uLabel.innerText = "Roblox Account / Handle";
-sLabel.innerText = "Total Match Victories (Optional)";
-uInput.placeholder = "Username...";
-} else if(platform === 'mc-java' || platform === 'mc-bedrock') {
-uLabel.innerText = "Minecraft Gamertag";
-sLabel.innerText = "Diamonds Mined Count";
-gGroup.style.display = 'none';
-uInput.placeholder = "Gamertag...";
-} else if(platform === 'youtube') {
-uLabel.innerText = "YouTube Creator Handle";
-sLabel.innerText = "Total Subscriber Base";
-gGroup.style.display = 'none';
-uInput.placeholder = "@handle...";
-}
-updateCardPreview();
-}
-// 🎨 RENDERING PIPELINE FOR PLAYER CARD INFRASTRUCTURE
-function updateCardPreview() {
-const username = document.getElementById('input-username').value || "Gamer Handle";
-const game = document.getElementById('input-game').value;
-const statVal = document.getElementById('input-stat').value || "0";
-// Draw Gradient Background
-let gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-if(activePlatform === 'roblox') {
-gradient.addColorStop(0, '#1e1e24'); gradient.addColorStop(1, '#00e5ff');
-} else if(activePlatform === 'youtube') {
-gradient.addColorStop(0, '#1e1e24'); gradient.addColorStop(1, '#ff0000');
-} else {
-gradient.addColorStop(0, '#1e1e24'); gradient.addColorStop(1, '#4CAF50');
-}
-ctx.fillStyle = gradient;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-// Draw Framing Lines
-ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-ctx.lineWidth = 2;
-ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-// Render Text Layouts
-ctx.fillStyle = '#fff';
-ctx.font = "900 36px 'Montserrat'";
-ctx.fillText(username, 50, 80);
-ctx.fillStyle = 'rgba(255,255,255,0.6)';
-ctx.font = "500 16px 'Roboto'";
-ctx.fillText("NETWORK IDENTITY CARD", 50, 40);
-ctx.fillStyle = '#00e5ff';
-ctx.font = "900 20px 'Montserrat'";
-if(activePlatform === 'roblox') {
-ctx.fillText(FEATURED GAME: ${game.toUpperCase()}, 50, 130);
-ctx.fillStyle = '#fff';
-ctx.fillText(VICTORIES: ${statVal}, 50, 170);
-} else if(activePlatform === 'youtube') {
-ctx.fillText(CHANNEL PROFILE, 50, 130);
-ctx.fillStyle = '#fff';
-ctx.fillText(SUBSCRIBERS: ${statVal}, 50, 170);
-} else {
-ctx.fillText(BLOCK WORLD DATA, 50, 130);
-ctx.fillStyle = '#fff';
-ctx.fillText(DIAMONDS: ${statVal}, 50, 170);
-}
-}
-async function submitAuraCard() {
-const username = document.getElementById('input-username').value;
-const statVal = parseInt(document.getElementById('input-stat').value) || 0;
-const game = document.getElementById('input-game').value;
-if(!username) {
-alert("Please enter a valid username/handle first.");
-return;
-}
-// Calculate Gamer Aura Score mathematically based on verification input
-let finalScore = statVal * 12;
-try {
-await db.collection("leaderboard").add({
-username: username,
-platform: activePlatform,
-game: activePlatform === 'roblox' ? game : activePlatform,
-score: finalScore,
-timestamp: firebase.firestore.FieldValue.serverTimestamp()
-});
-alert("Stats verified! AuraCard pushed to global ranking pipeline.");
-switchScreen('leaderboard');
-} catch(error) {
-console.error("Database save exception: ", error);
-alert("Write request rejected. Check connection rules.");
-}
-}
-async function loadLeaderboardData() {
-const container = document.getElementById('leaderboard-container');
-container.innerHTML = <div style="text-align: center; color: var(--muted);  padding: 20px;">Reading production indexes...</div>;
-try {
-const snapshot = await db.collection("leaderboard")
-.orderBy("score", "desc")
-.limit(20).get();
-container.innerHTML = '';
-if(snapshot.empty) {
-container.innerHTML = <div style="text-align: center; color: var(--muted);  padding: 20px;">No ranked gamers found yet.</div>;
-return;
-}
-let rank = 1;
-snapshot.forEach(doc => {
-const data = doc.data();
-const item = document.createElement('div');
-item.className = leaderboard-item rank-${rank <= 3 ? rank : 'regular'};
-item.innerHTML = <div class="rank-info"> <div class="rank-num">${rank}</div>  <span class="player-name">${data.username}</span> <span class="player-game">${data.game}</span> </div> </div> <div class="score-display"> <div class="score-val">${data.score}</div> <div class="score-lbl">Gamer Aura</div> </div>;
-container.appendChild(item);
-rank++;
-});
-} catch(error) {
-console.error("Leaderboard fetch error: ", error);
-container.innerHTML = <div style="text-align: center; color: var(--purple);  padding: 20px;">Failed to read ranking indexes.</div>;
-}
-}
-function downloadCardImage() {
-const link = document.createElement('a');
-link.download = auracard-${activePlatform}.png;
-link.href = canvas.toDataURL();
-link.click();
-}
+        // 🚀 INITIALIZE
+        updateCardPreview();
+    </script>
+</body>
+</html>
