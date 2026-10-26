@@ -29,10 +29,7 @@
       "applicationCategory": "GameApplication",
       "operatingSystem": "Web",
       "browserRequirements": "Requires HTML5, JavaScript",
-      "creator": {
-        "@type": "Person",
-        "name": "Dano"
-      },
+      "creator": { "@type": "Person", "name": "Dano" },
       "abstract": "A free interactive gaming profile card creator for Roblox, Minecraft, and YouTube stats."
     }
     </script>
@@ -43,8 +40,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 4.6
-        const CURRENT_VERSION = "4.6"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 4.7
+        const CURRENT_VERSION = "4.7"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -436,16 +433,19 @@
         }
         
         function toggleMusic() { 
+            // 🔥 FIX: Ensure there is a source before trying to play
+            if (!funkPlayer.src || funkPlayer.src === "") {
+                funkPlayer.src = FUNK_LOW;
+            }
+            
             if (funkPlayer.paused) { 
                 funkPlayer.volume = 0.5; 
                 funkPlayer.play()
                     .then(() => updateMusicUI(true))
                     .catch(e => { 
-                        console.log(e); 
-                        // Only trigger failure UI if it's NOT an interruption/abort error
-                        if (e.name !== 'AbortError') {
-                            updateMusicUI(false); 
-                        }
+                        console.error("Music Play Error:", e); 
+                        updateMusicUI(false); 
+                        alert("Could not play music: " + e.message + "\nTry clicking again.");
                     }); 
             } else { 
                 funkPlayer.pause(); 
@@ -699,6 +699,14 @@
             window.generatedCardData = { image: data.image, username: data.username, platform: data.platform, level: data.wins, bio: data.bio };
             const largePreview = document.getElementById('large-preview'); largePreview.src = data.image; largePreview.style.display = 'block';
             document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'none'; document.getElementById('shareBtn').style.display = 'flex'; document.getElementById('upload-success').style.display = 'none';
+            
+            // 🔥 FIX: Set music source when viewing a leaderboard card
+            if (data.wins >= 100) { funkPlayer.src = FUNK_HIGH; } 
+            else if (data.wins >= 50) { funkPlayer.src = FUNK_MID; } 
+            else { funkPlayer.src = FUNK_LOW; }
+            
+            funkPlayer.load();
+            tryAutoplayMusic();
         }
 
         auth.onAuthStateChanged((user) => {
