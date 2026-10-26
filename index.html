@@ -43,8 +43,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 4.5
-        const CURRENT_VERSION = "4.5"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 4.6
+        const CURRENT_VERSION = "4.6"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -89,7 +89,8 @@
         .feedback-btn { background: var(--purple); border: none; color: #fff; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; }
         .admin-btn { background: var(--gold); border: none; color: #000; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; display: none; font-size: 14px; }
         .showcase-btn { background: #ff0000; border: none; color: #fff; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; }
-        .logout-btn { background: transparent; border: 1px solid #ff5252; color: #ff5252; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .logout-btn { background: transparent; border: 1px solid #ff5252; color: #ff5252; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .logout-btn:hover { background: #ff5252; color: white; }
 
         .auth-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .auth-input { width: 100%; padding: 12px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; font-size: 16px; }
@@ -118,12 +119,12 @@
 
         .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
         .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
-        .add-btn:hover { transform: scale(1.1); }
+        .add-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(0,229,255,0.4); }
         
         .search-container { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
         .search-input { flex: 1; padding: 12px; background: rgba(30, 30, 36, 0.9); border: 1px solid #333; color: white; border-radius: 8px; font-family: 'Roboto', sans-serif; font-size: 16px; backdrop-filter: blur(10px); }
         .search-btn { padding: 12px 20px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .search-btn:hover { background: #00b8cc; }
+        .search-btn:hover { background: #00b8cc; transform: scale(1.05); }
 
         .leaderboard-list { width: 100%; background: rgba(30, 30, 36, 0.9); backdrop-filter: blur(10px); border-radius: 12px; padding: 10px; box-sizing: border-box; border: 1px solid #333; }
         .lb-card { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; background: #15151a; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
@@ -148,18 +149,29 @@
         .form-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--muted); }
         .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .modal-actions button { flex: 1; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
+        .modal-actions button { flex: 1; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .modal-actions button:hover { transform: scale(1.02); }
 
         #card-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 8, 0.95); z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
         #card-viewer.active { display: flex; }
-        #large-preview { max-width: 95vw; max-height: 75vh; border-radius: 12px; display: none; }
+        #large-preview { max-width: 95vw; max-height: 75vh; border-radius: 12px; display: none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .viewer-actions { display: flex; gap: 15px; margin-top: 30px; }
-        .viewer-actions button { padding: 15px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; }
-        .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; }
-        .music-toggle { position: absolute; top: 30px; left: 40px; background: #ff5252; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        /* 🎨 RESTORED BUTTON ANIMATIONS */
+        .viewer-actions button { padding: 15px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: all 0.3s ease; }
+        .viewer-actions button:hover { transform: translateY(-3px) scale(1.05); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        
+        .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; transition: 0.3s; }
+        .close-viewer:hover { color: #ff5252; transform: rotate(90deg); }
+        
+        /* 🎵 MUSIC BUTTON FIX */
+        .music-toggle { position: absolute; top: 30px; left: 40px; background: #ff5252; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; z-index: 10; font-family: 'Montserrat', sans-serif; }
+        .music-toggle:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); }
 
         .seo-footer { width: 100%; max-width: 800px; margin-top: 40px; margin-bottom: 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
         .seo-footer h1 { font-size: 16px; color: var(--text); }
+        
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -396,16 +408,55 @@
         let isGuest = false;
         window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
         const funkPlayer = document.getElementById('funkPlayer');
-        const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
+        const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
+        const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; 
+        const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
 
-        function updateMusicUI(isPlaying) { const btn = document.getElementById('musicToggle'); if (!btn) return; if (isPlaying) { btn.innerText = '🔊 Music On'; btn.style.background = 'var(--green)'; } else { btn.innerText = '🔇 Click to Play Music'; btn.style.background = '#ff5252'; } }
-        async function tryAutoplayMusic() { try { funkPlayer.volume = 0.5; await funkPlayer.play(); updateMusicUI(true); } catch (err) { updateMusicUI(false); } }
-        function toggleMusic() { if (funkPlayer.paused) { funkPlayer.volume = 0.5; funkPlayer.play().then(() => updateMusicUI(true)).catch(e => { console.log(e); updateMusicUI(false); }); } else { funkPlayer.pause(); updateMusicUI(false); } }
+        function updateMusicUI(isPlaying) { 
+            const btn = document.getElementById('musicToggle'); 
+            if (!btn) return; 
+            if (isPlaying) { 
+                btn.innerText = '🔊 Music On'; 
+                btn.style.background = 'var(--green)'; 
+            } else { 
+                btn.innerText = '🔇 Click to Play Music'; 
+                btn.style.background = '#ff5252'; 
+            } 
+        }
+        
+        async function tryAutoplayMusic() { 
+            try { 
+                funkPlayer.volume = 0.5; 
+                await funkPlayer.play(); 
+                updateMusicUI(true); 
+            } catch (err) { 
+                console.log("Autoplay blocked:", err);
+                updateMusicUI(false); 
+            } 
+        }
+        
+        function toggleMusic() { 
+            if (funkPlayer.paused) { 
+                funkPlayer.volume = 0.5; 
+                funkPlayer.play()
+                    .then(() => updateMusicUI(true))
+                    .catch(e => { 
+                        console.log(e); 
+                        // Only trigger failure UI if it's NOT an interruption/abort error
+                        if (e.name !== 'AbortError') {
+                            updateMusicUI(false); 
+                        }
+                    }); 
+            } else { 
+                funkPlayer.pause(); 
+                updateMusicUI(false); 
+            } 
+        }
 
         function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
         function goToDashboard() { showScreen('dashboard-screen'); }
 
-        // 👤 GUEST LOGIC (FIXED)
+        // 👤 GUEST LOGIC
         function enterAsGuest() {
             isGuest = true;
             currentUser = { displayName: "Guest", email: "guest@auracard.user", isGuest: true, photoURL: "https://via.placeholder.com/35" };
@@ -573,9 +624,17 @@
                 if (currentPlatform === 'roblox') { stat1 = d.games_played || "0"; stat2 = d.games_won || "0"; stat3 = d.aura_streak || "0x"; stat4 = d.most_played_game || "Rivals"; stat5 = d.friends !== undefined ? d.friends : "0"; label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS"; }
                 else if (currentPlatform === 'youtube') { stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level); stat2 = d.subs.toLocaleString(); stat3 = d.views.toLocaleString(); stat4 = "YouTube"; stat5 = "Creator"; label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS"; }
                 else { stat1 = d.blocks_mined || "0"; stat2 = d.mobs_killed || "0"; stat3 = d.diamonds_found || "0"; stat4 = currentPlatform.toUpperCase(); stat5 = d.playtime || "0 Hours"; label1 = "BLOCKS MINED"; label2 = "MOBS KILLED"; label3 = "DIAMONDS"; label4 = "PLATFORM"; label5 = "PLAYTIME"; }
+                
+                // Set Music Source
                 if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } else { funkPlayer.src = FUNK_LOW; }
+            } else {
+                // Fallback if backend fails
+                funkPlayer.src = FUNK_LOW;
             }
-            funkPlayer.load(); tryAutoplayMusic();
+            
+            funkPlayer.load(); 
+            tryAutoplayMusic();
+            
             const canvas = document.getElementById('card-canvas'); canvas.width = 900; canvas.height = 600; const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#0f0f13'; ctx.fillRect(0, 0, 900, 600); ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, 880, 580);
             ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 50px "Montserrat", sans-serif'; ctx.fillText("AURACARD", 50, 80);
@@ -601,24 +660,15 @@
         
         document.getElementById('shareBtn').addEventListener('click', async () => { if (!window.generatedCardData) return; const shareData = { title: 'AuraCard', text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`, url: 'https://auracard.isroot.in' }; try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`); alert("Link copied!"); } } catch (err) {} });
 
-        // 🔍 SEARCH FUNCTIONALITY
         async function searchUser() {
             const searchTerm = document.getElementById('search-input').value.trim().toLowerCase();
             if (!searchTerm) return alert("Please enter a username to search!");
-
             const docId = `${currentPlatform}_${searchTerm}`;
             try {
                 const doc = await db.collection('auracards').doc(docId).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    window.leaderboardCache[doc.id] = data;
-                    viewLeaderboardCard(doc.id);
-                } else {
-                    alert("auracard not generated go signin or login and generate");
-                }
-            } catch (e) {
-                alert("Error searching: " + e.message);
-            }
+                if (doc.exists) { const data = doc.data(); window.leaderboardCache[doc.id] = data; viewLeaderboardCard(doc.id); } 
+                else { alert("auracard not generated go signin or login and generate"); }
+            } catch (e) { alert("Error searching: " + e.message); }
         }
 
         function loadLeaderboard(platform) {
@@ -627,33 +677,19 @@
                 list.innerHTML = ""; if (snap.empty) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
                 let rank = 1; snap.forEach((doc) => {
                     const data = doc.data(); window.leaderboardCache[doc.id] = data;
-                    
                     const isDev = DEV_USERNAMES.includes(data.username.toLowerCase()) || ADMIN_EMAILS.includes(data.user);
-                    
                     const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
                     const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
-                    
-                    let crown = rank === 1 ? '👑' : '';
-                    let rowClass = rank === 1 ? 'lb-card rank-1' : 'lb-card';
-                    let devBadge = '';
-
-                    if (isDev) {
-                        rowClass = 'lb-card dev-card';
-                        devBadge = `<span style="background: var(--accent); color: #000; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 900;">DEV</span>`;
-                        crown = '🛠️';
-                    }
-
+                    let crown = rank === 1 ? '👑' : ''; let rowClass = rank === 1 ? 'lb-card rank-1' : 'lb-card'; let devBadge = '';
+                    if (isDev) { rowClass = 'lb-card dev-card'; devBadge = `<span style="background: var(--accent); color: #000; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 900;">DEV</span>`; crown = '🛠️'; }
                     const iconSVG = getPlatformIconSVG(data.platform);
                     list.innerHTML += `<div class="${rowClass}" onclick="viewLeaderboardCard('${doc.id}')"><div class="lb-left"><span class="lb-rank">${crown} #${rank}</span>${iconSVG}<span class="lb-name">${data.username} ${devBadge}</span></div><span class="lb-level" style="color: ${color};">${winLabel}</span></div>`; rank++;
                 });
             }).catch((err) => { 
                 console.error(err);
                 const match = err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/);
-                if (match) {
-                    list.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 16px;">Database index needed!<br><br><a href="${match[0]}" target="_blank" style="color: #00e5ff; font-weight: bold; text-decoration: underline;">CLICK HERE TO CREATE IT</a></p>`;
-                } else {
-                    list.innerHTML = `<p style="text-align: center; color: #ff5252;">Error: ${err.message}</p>`;
-                }
+                if (match) { list.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 16px;">Database index needed!<br><br><a href="${match[0]}" target="_blank" style="color: #00e5ff; font-weight: bold; text-decoration: underline;">CLICK HERE TO CREATE IT</a></p>`; } 
+                else { list.innerHTML = `<p style="text-align: center; color: #ff5252;">Error: ${err.message}</p>`; }
             });
         }
 
@@ -665,40 +701,21 @@
             document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'none'; document.getElementById('shareBtn').style.display = 'flex'; document.getElementById('upload-success').style.display = 'none';
         }
 
-        // 🚀 AUTO-LOGIN & 5-DAY TIMEOUT LOGIC
         auth.onAuthStateChanged((user) => {
-            if (isGuest) return; // Skip if guest is active
-            
+            if (isGuest) return;
             if (user) {
-                // Check if 5 days have passed since last login
                 const lastLogin = localStorage.getItem('auracard_last_login');
                 const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
-                
                 if (lastLogin && (Date.now() - parseInt(lastLogin) > fiveDaysMs)) {
-                    // 5 days passed! Force logout.
-                    auth.signOut();
-                    localStorage.removeItem('auracard_last_login');
-                    alert("Session expired (5 days of inactivity). Please log in again!");
-                    showScreen('login-screen');
-                    return;
+                    auth.signOut(); localStorage.removeItem('auracard_last_login'); alert("Session expired (5 days of inactivity). Please log in again!"); showScreen('login-screen'); return;
                 }
-
-                // Update login time
                 localStorage.setItem('auracard_last_login', Date.now());
-                
                 currentUser = user; 
                 let displayName = user.displayName;
-                if (!displayName && user.email) {
-                    displayName = user.email.split('@')[0];
-                }
+                if (!displayName && user.email) { displayName = user.email.split('@')[0]; }
                 document.getElementById('user-name').innerText = displayName || "Gamer"; 
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
-                
-                if (ADMIN_EMAILS.includes(user.email)) { 
-                    document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); 
-                }
-                
-                // Auto-skip to Dashboard
+                if (ADMIN_EMAILS.includes(user.email)) { document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); }
                 showScreen('dashboard-screen');
             } else { showScreen('login-screen'); }
         });
