@@ -5,15 +5,21 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>AuraCard - Gamer Platform</title>
+    
+    <!-- 🚀 SEO UPGRADE: Title and Meta Tags -->
+    <title>AuraCard | Free Gaming Aura Cards for Roblox, Minecraft & YouTube</title>
+    <meta name="description" content="Generate your free AuraCard for Roblox, Minecraft Java, Minecraft Bedrock, and YouTube. Calculate your Gamer Aura, show off your stats, and climb the leaderboard!">
+    <meta name="keywords" content="AuraCard, Gamer Aura, Roblox Aura, Minecraft Stats, YouTube Stats, Gaming Leaderboard, Dano, Aura Card Generator">
+    <meta name="author" content="Dano">
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 2.7 (Feedback Update)
-        const CURRENT_VERSION = "2.7"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 3.5 (SEO Safety Check)
+        const CURRENT_VERSION = "3.5"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -32,23 +38,14 @@
         .nav-user { display: flex; align-items: center; gap: 10px; }
         .nav-user img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--accent); }
         
-        /* ☕ SUPPORT, 💬 FEEDBACK & 🎥 SHOWCASE BUTTONS */
         .support-btn { background: var(--orange); border: none; color: #fff; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .support-btn:hover { background: #e68a00; transform: scale(1.05); }
-        
         .feedback-btn { background: var(--purple); border: none; color: #fff; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .feedback-btn:hover { background: #7b1fa2; transform: scale(1.05); }
-        
+        .admin-btn { background: var(--gold); border: none; color: #000; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; display: none; }
         .showcase-btn { background: #ff0000; border: none; color: #fff; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .showcase-btn:hover { background: #cc0000; transform: scale(1.05); }
-
         .logout-btn { background: transparent; border: 1px solid #ff5252; color: #ff5252; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .logout-btn:hover { background: #ff5252; color: white; }
 
         .login-box { background: var(--panel); padding: 40px; border-radius: 16px; text-align: center; border-top: 5px solid var(--accent); max-width: 400px; width: 100%; margin-top: 10vh; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
         .auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
-        .auth-btn:hover { transform: scale(1.02); }
         .btn-google { background: white; color: #333; }
         .btn-github { background: #24292e; color: white; border: 1px solid #444; }
         .btn-ms { background: #0078d4; color: white; }
@@ -58,26 +55,19 @@
         .platform-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
         .platform-card { background: var(--panel); padding: 30px; border-radius: 16px; width: 200px; text-align: center; cursor: pointer; border: 2px solid #333; transition: 0.3s; }
         .platform-card:hover { border-color: var(--accent); transform: translateY(-5px); }
-        
-        .platform-logo { width: 85px; height: 85px; margin-bottom: 15px; object-fit: contain; display: inline-block; vertical-align: middle; filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.5)); }
-        
+        .platform-logo { width: 85px; height: 85px; margin-bottom: 15px; object-fit: contain; }
         .platform-card h3 { margin: 0; font-family: 'Montserrat', sans-serif; }
 
         .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
-        .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
-        .add-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(0,229,255,0.5); }
+        .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; }
         
         .leaderboard-list { width: 100%; background: var(--panel); border-radius: 12px; padding: 10px; box-sizing: border-box; }
-        
-        .lb-card { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; 
-            background: #15151a; border: 1px solid #333; cursor: pointer; transition: 0.2s;
-        }
-        .lb-card:hover { transform: scale(1.02); border-color: var(--accent); }
-        .lb-card:last-child { margin-bottom: 0; }
-        
+        .lb-card { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; background: #15151a; border: 1px solid #333; cursor: pointer; }
         .lb-card.rank-1 { background: rgba(255, 215, 0, 0.1); border: 2px solid var(--gold); }
+        
+        /* 🛠️ DEVELOPER CARD STYLE */
+        .lb-card.dev-card { background: rgba(0, 229, 255, 0.1); border: 2px solid var(--accent); }
+        .lb-card.dev-card .lb-name { color: var(--accent); }
         
         .lb-left { display: flex; align-items: center; gap: 15px; }
         .lb-rank { font-weight: 900; font-size: 18px; color: var(--muted); width: 30px; }
@@ -85,62 +75,28 @@
         .lb-icon { width: 35px; height: 35px; }
         .lb-name { font-size: 18px; font-weight: bold; font-family: 'Montserrat', sans-serif; }
         .lb-level { font-size: 16px; font-weight: bold; color: var(--accent); }
-        .rank-1 .lb-level { color: var(--gold); }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal { background: var(--panel); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; border-top: 5px solid var(--accent); }
+        .modal { background: var(--panel); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; border-top: 5px solid var(--accent); max-height: 85vh; overflow-y: auto; }
         .modal h2 { margin-top: 0; color: var(--accent); font-family: 'Montserrat', sans-serif; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--muted); }
-        .form-group input { width: 100%; padding: 10px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .modal-actions button { flex: 1; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-cancel { background: #333; color: white; }
-        .btn-submit { background: var(--accent); color: #000; }
 
-        #card-viewer {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 8, 0.95); z-index: 200;
-            flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
+        #card-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 8, 0.95); z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
         #card-viewer.active { display: flex; }
-        
-        #large-preview { 
-            max-width: 95vw; max-height: 75vh; border-radius: 12px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: none;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        #large-preview { max-width: 95vw; max-height: 75vh; border-radius: 12px; display: none; }
+        .viewer-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .viewer-actions button { padding: 15px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; }
+        .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; }
+        .music-toggle { position: absolute; top: 30px; left: 40px; background: #ff5252; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .viewer-actions { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; justify-content: center; }
-        .viewer-actions button { padding: 15px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .btn-download { background: var(--green); color: white; }
-        .btn-download:hover { background: #388e3c; transform: scale(1.05); }
-        .btn-upload { background: var(--accent); color: #000; }
-        .btn-upload:hover { background: #00b8cc; transform: scale(1.05); }
-        .btn-share { background: var(--purple); color: white; }
-        .btn-share:hover { background: #7b1fa2; transform: scale(1.05); }
-        
-        .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; transition: 0.3s; }
-        .close-viewer:hover { color: #ff5252; transform: rotate(90deg); }
-        
-        .music-toggle {
-            position: absolute; top: 30px; left: 40px;
-            background: #ff5252; color: white;
-            border: none; padding: 12px 22px; border-radius: 8px;
-            font-size: 15px; font-weight: bold; cursor: pointer;
-            transition: 0.3s; z-index: 10;
-            font-family: 'Montserrat', sans-serif;
-        }
-        .music-toggle:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-
-        #upload-success { color: var(--green); font-size: 16px; margin-top: 15px; display: none; font-weight: bold; }
-
-        /* ☕ DONATE BUTTON STYLE */
-        .donate-action-btn { background: var(--orange); color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: bold; display: inline-block; transition: 0.3s; border: none; cursor: pointer; }
-        .donate-action-btn:hover { background: #e68a00; transform: scale(1.05); }
+        /* 🚀 SEO FOOTER */
+        .seo-footer { width: 100%; max-width: 800px; margin-top: 40px; margin-bottom: 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 20px; border-top: 1px solid #333; }
+        .seo-footer h1 { font-size: 16px; color: var(--text); }
     </style>
 </head>
 <body>
@@ -152,20 +108,10 @@
         <div class="login-box">
             <h1 style="font-family: 'Montserrat'; font-weight: 900; color: var(--accent); font-size: 40px; margin-bottom: 10px;">AuraCard</h1>
             <p style="color: var(--muted); margin-bottom: 30px;">Sign in to access your cross-game profile.</p>
-            
-            <button class="auth-btn btn-google" id="googleLoginBtn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Sign in with Google
-            </button>
-            <button class="auth-btn btn-github" id="githubLoginBtn">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> 
-                Sign in with GitHub
-            </button>
-            <button class="auth-btn btn-ms" id="microsoftLoginBtn">
-                Sign in with Microsoft / Xbox
-            </button>
-            <button class="auth-btn btn-discord" id="discordLoginBtn">
-                Sign in with Discord
-            </button>
+            <button class="auth-btn btn-google" id="googleLoginBtn"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Sign in with Google</button>
+            <button class="auth-btn btn-github" id="githubLoginBtn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Sign in with GitHub</button>
+            <button class="auth-btn btn-ms" id="microsoftLoginBtn">Sign in with Microsoft / Xbox</button>
+            <button class="auth-btn btn-discord" id="discordLoginBtn">Sign in with Discord</button>
         </div>
     </div>
 
@@ -174,6 +120,7 @@
         <div class="navbar">
             <div class="nav-title">AuraCard</div>
             <div class="nav-user">
+                <button class="admin-btn" id="adminBtn" onclick="openAdminModal()">👑 Admin</button>
                 <button class="support-btn" onclick="showSupportSoon()">☕ Support</button>
                 <button class="feedback-btn" onclick="openFeedbackModal()">💬 Feedback</button>
                 <button class="showcase-btn" onclick="window.open('https://www.youtube.com/watch?v=z-Ghw6lu2is', '_blank')">🎥 Showcase</button>
@@ -182,69 +129,20 @@
                 <button class="logout-btn" id="logoutBtn">Logout</button>
             </div>
         </div>
-        
         <div class="dashboard">
             <h2 style="text-align: center; font-family: 'Montserrat';">Select Your Platform</h2>
             <div class="platform-grid">
-                
-                <div class="platform-card" onclick="selectPlatform('minecraft')">
-                    <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/>
-                        <polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/>
-                        <polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/>
-                        <polygon points="20,40 30,45 30,55 20,50" fill="#6a4124"/>
-                        <polygon points="35,60 45,65 45,75 35,70" fill="#6a4124"/>
-                        <polygon points="60,55 75,45 75,55 60,65" fill="#4a3220"/>
-                        <polygon points="70,70 80,65 80,75 70,80" fill="#4a3220"/>
-                        <polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/>
-                        <polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/>
-                        <polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/>
-                        <polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/>
-                    </svg>
-                    <h3>Minecraft Java</h3>
-                </div>
-                
-                <div class="platform-card" onclick="selectPlatform('bedrock')">
-                    <svg class="platform-logo" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-                        <rect width="16" height="16" fill="#8B5A2B"/>
-                        <rect x="2" y="6" width="2" height="2" fill="#6a4124"/>
-                        <rect x="6" y="8" width="2" height="2" fill="#6a4124"/>
-                        <rect x="12" y="5" width="2" height="2" fill="#6a4124"/>
-                        <rect x="9" y="11" width="2" height="2" fill="#6a4124"/>
-                        <rect x="4" y="13" width="2" height="2" fill="#6a4124"/>
-                        <rect x="14" y="10" width="2" height="2" fill="#6a4124"/>
-                        <rect width="16" height="5" fill="#5D9C3F"/>
-                        <rect x="0" y="4" width="2" height="2" fill="#5D9C3F"/>
-                        <rect x="3" y="5" width="2" height="2" fill="#5D9C3F"/>
-                        <rect x="6" y="4" width="2" height="2" fill="#5D9C3F"/>
-                        <rect x="9" y="5" width="2" height="2" fill="#5D9C3F"/>
-                        <rect x="12" y="4" width="2" height="2" fill="#5D9C3F"/>
-                        <rect x="14" y="5" width="2" height="2" fill="#5D9C3F"/>
-                        <rect x="2" y="1" width="2" height="2" fill="#4C8232"/>
-                        <rect x="7" y="0" width="2" height="2" fill="#4C8232"/>
-                        <rect x="11" y="2" width="2" height="2" fill="#4C8232"/>
-                        <rect x="14" y="1" width="2" height="2" fill="#4C8232"/>
-                    </svg>
-                    <h3>Minecraft Bedrock</h3>
-                </div>
-                
-                <div class="platform-card" onclick="selectPlatform('roblox')">
-                    <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" fill="#0074FF"/>
-                        <rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/>
-                        <rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/>
-                    </svg>
-                    <h3>Roblox</h3>
-                </div>
-                
-                <div class="platform-card" onclick="selectPlatform('youtube')">
-                    <svg class="platform-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
-                        <path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    <h3>YouTube</h3>
-                </div>
-                
+                <div class="platform-card" onclick="selectPlatform('minecraft')"><h3>Minecraft Java</h3></div>
+                <div class="platform-card" onclick="selectPlatform('bedrock')"><h3>Minecraft Bedrock</h3></div>
+                <div class="platform-card" onclick="selectPlatform('roblox')"><h3>Roblox</h3></div>
+                <div class="platform-card" onclick="selectPlatform('youtube')"><h3>YouTube</h3></div>
+            </div>
+            
+            <!-- 🚀 SEO BOT TEXT & TRANSPARENCY -->
+            <div class="seo-footer">
+                <h1>Free Gaming Aura Card Generator</h1>
+                <p>AuraCard is the ultimate gaming profile generator. Create and download free stat cards for <b>Roblox</b> (games like Rivals), <b>Minecraft Java</b>, <b>Minecraft Bedrock</b>, and <b>YouTube</b>. Track your Gamer Aura score, show off your blocks mined, mobs killed, and diamond counts, and compete on the global leaderboard.</p>
+                <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Built by Dano (11) using HTML, Python, and Firebase. AI was used as a coding co-pilot to help learn and squash bugs!</p>
             </div>
         </div>
     </div>
@@ -254,21 +152,18 @@
         <div class="navbar">
             <div class="nav-title" id="platform-title">Platform</div>
             <div class="nav-user">
+                <button class="admin-btn" onclick="openAdminModal()">👑 Admin</button>
                 <button class="support-btn" onclick="showSupportSoon()">☕ Support</button>
                 <button class="feedback-btn" onclick="openFeedbackModal()">💬 Feedback</button>
-                <button class="showcase-btn" onclick="window.open('https://www.youtube.com/watch?v=z-Ghw6lu2is', '_blank')">🎥 Showcase</button>
                 <button class="logout-btn" onclick="goToDashboard()" style="border-color: #00e5ff; color: #00e5ff;">Back</button>
             </div>
         </div>
-        
         <div class="platform-view" style="width: 100%; max-width: 800px;">
             <div class="top-bar">
                 <h2 style="font-family: 'Montserrat'; margin: 0;" id="platform-leaderboard-title">Top Aura Farmers</h2>
                 <button class="add-btn" id="openCreateModal">+</button>
             </div>
-            <div class="leaderboard-list" id="leaderboard-content">
-                <p style="text-align: center; color: var(--muted);">Loading...</p>
-            </div>
+            <div class="leaderboard-list" id="leaderboard-content"><p style="text-align: center; color: var(--muted);">Loading...</p></div>
         </div>
     </div>
 
@@ -280,23 +175,16 @@
                 <label>Username / Handle</label>
                 <input type="text" id="input-username" placeholder="Enter username or @handle...">
             </div>
-            
             <div class="form-group" id="roblox-inputs" style="display: none;">
                 <label>Most Played Game (Roblox)</label>
                 <input type="text" id="input-game" placeholder="e.g., Rivals" value="Rivals">
-                
                 <label>Total Wins in that game (Optional)</label>
                 <input type="number" id="input-won" placeholder="e.g., 500">
-                <p style="font-size: 11px; color: var(--accent); margin-top: 5px; line-height: 1.4;">
-                    💡 <b>How to find this:</b> Open the game, go to your profile, and check your total wins. Leave blank to auto-generate!
-                </p>
             </div>
-
             <p id="validation-error" style="color: #ff5252; font-size: 12px; display: none;">Error!</p>
-            
-            <div class="modal-actions" id="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-submit" id="validateBtn">Validate</button>
+            <div class="modal-actions">
+                <button onclick="closeModal()" style="background: #333; color: white;">Cancel</button>
+                <button onclick="validateAndGenerate()" id="validateBtn" style="background: var(--accent); color: #000;">Validate</button>
             </div>
         </div>
     </div>
@@ -305,13 +193,25 @@
     <div class="modal-overlay" id="feedback-modal">
         <div class="modal" style="border-top-color: var(--purple);">
             <h2 style="color: var(--purple);">💬 Send Feedback</h2>
-            <p style="color: var(--muted); font-size: 14px; margin-bottom: 15px;">Tell Dano what you think! Found a bug? Have an idea? Let him know.</p>
-            
+            <div class="form-group">
+                <label>Your Email (So Dano can reply!)</label>
+                <input type="email" id="feedback-email" placeholder="you@gmail.com">
+            </div>
             <textarea id="feedback-text" placeholder="Type your feedback here..." style="width: 100%; height: 100px; padding: 10px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; resize: none;"></textarea>
-
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeFeedbackModal()">Cancel</button>
-                <button class="btn-submit" id="submit-feedback-btn" onclick="submitFeedback()" style="background: var(--purple); color: white;">Send</button>
+                <button onclick="closeFeedbackModal()" style="background: #333; color: white;">Cancel</button>
+                <button id="submit-feedback-btn" onclick="submitFeedback()" style="background: var(--purple); color: white;">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👑 ADMIN MODAL -->
+    <div class="modal-overlay" id="admin-modal">
+        <div class="modal" style="border-top-color: var(--gold); max-width: 600px;">
+            <h2 style="color: var(--gold);">👑 Admin Feedback Inbox</h2>
+            <div id="admin-feedback-list" style="max-height: 50vh; overflow-y: auto;"></div>
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button onclick="closeAdminModal()" style="background: #333; color: white;">Close</button>
             </div>
         </div>
     </div>
@@ -321,559 +221,203 @@
         <button class="close-viewer" onclick="closeViewer()">✖</button>
         <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">🔇 Click to Play Music</button>
         <img id="large-preview">
-        
         <div class="viewer-actions" id="viewer-actions">
-            <button class="btn-download" id="downloadBtn">📥 Download PNG</button>
-            <button class="btn-share" id="shareBtn" style="display: none;">📤 Share Card</button>
-            <button class="btn-upload" id="uploadBtn">🚀 Upload to AuraCard</button>
+            <button id="downloadBtn" style="background: var(--green); color: white;">📥 Download PNG</button>
+            <button id="shareBtn" style="background: var(--purple); color: white; display: none;">📤 Share Card</button>
+            <button id="uploadBtn" style="background: var(--accent); color: #000;">🚀 Upload to AuraCard</button>
         </div>
-        
-        <p id="upload-success">✅ Successfully uploaded to the gallery!</p>
+        <p id="upload-success" style="color: var(--green); display: none; font-weight: bold;">✅ Successfully uploaded!</p>
         <canvas id="card-canvas" style="display: none;"></canvas>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCYhHn7VEETiFPkMh9OtYO825-ejUQBNUg",
-            authDomain: "auracard-7b97f.firebaseapp.com",
-            projectId: "auracard-7b97f",
-            storageBucket: "auracard-7b97f.firebasestorage.app",
-            messagingSenderId: "266276728636",
-            appId: "1:266276728636:web:2c36f2e588d6d8dcab3839",
-            measurementId: "G-MZ0242QRC7"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyCYhHn7VEETiFPkMh9OtYO825-ejUQBNUg", authDomain: "auracard-7b97f.firebaseapp.com", projectId: "auracard-7b97f", storageBucket: "auracard-7b97f.firebasestorage.app", messagingSenderId: "266276728636", appId: "1:266276728636:web:2c36f2e588d6d8dcab3839", measurementId: "G-MZ0242QRC7" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentPlatform = "";
-        let currentUser = null;
-        let validatedUsername = "";
-        window.realData = null; 
-        window.generatedCardData = null;
-        window.leaderboardCache = {}; 
+        // 🛠️ ADD YOUR OTHER EMAILS OR USERNAMES HERE!
+        const ADMIN_EMAILS = [
+            "vaishinstruz@gmail.com", 
+            "YOUR_OTHER_EMAIL_HERE@gmail.com" // <-- Put your other email here
+        ];
 
+        const DEV_USERNAMES = [
+            "dano", 
+            "danoblox491", 
+            "dano-dev" 
+        ];
+
+        let currentPlatform = ""; let currentUser = null; let validatedUsername = "";
+        window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
         const funkPlayer = document.getElementById('funkPlayer');
-        
-        const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-        const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
-        const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
+        const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
 
-        function updateMusicUI(isPlaying) {
-            const btn = document.getElementById('musicToggle');
-            if (!btn) return;
-            if (isPlaying) {
-                btn.innerText = '🔊 Music On';
-                btn.style.background = 'var(--green)';
-            } else {
-                btn.innerText = '🔇 Click to Play Music';
-                btn.style.background = '#ff5252';
-            }
-        }
+        function updateMusicUI(isPlaying) { const btn = document.getElementById('musicToggle'); if (!btn) return; if (isPlaying) { btn.innerText = '🔊 Music On'; btn.style.background = 'var(--green)'; } else { btn.innerText = '🔇 Click to Play Music'; btn.style.background = '#ff5252'; } }
+        async function tryAutoplayMusic() { try { funkPlayer.volume = 0.5; await funkPlayer.play(); updateMusicUI(true); } catch (err) { updateMusicUI(false); } }
+        function toggleMusic() { if (funkPlayer.paused) { funkPlayer.volume = 0.5; funkPlayer.play().then(() => updateMusicUI(true)).catch(e => { console.log(e); updateMusicUI(false); }); } else { funkPlayer.pause(); updateMusicUI(false); } }
 
-        async function tryAutoplayMusic() {
-            try {
-                funkPlayer.volume = 0.5;
-                await funkPlayer.play();
-                updateMusicUI(true);
-            } catch (err) {
-                console.log('Autoplay blocked by browser. User needs to click.');
-                updateMusicUI(false);
-            }
-        }
-
-        function toggleMusic() {
-            if (funkPlayer.paused) {
-                funkPlayer.volume = 0.5;
-                funkPlayer.play()
-                    .then(() => updateMusicUI(true))
-                    .catch((e) => {
-                        if (e.name === 'AbortError' || e.message.includes('interrupted')) {
-                            console.log('Playback interrupted safely.');
-                        } else {
-                            console.log('Play failed:', e);
-                            alert('Music error: ' + e.message);
-                            updateMusicUI(false);
-                        }
-                    });
-            } else {
-                funkPlayer.pause();
-                updateMusicUI(false);
-            }
-        }
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
+        function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
         function goToDashboard() { showScreen('dashboard-screen'); }
 
-        function getPlatformIconSVG(platform) {
-            if (platform === 'minecraft') {
-                return `<svg class="lb-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`;
-            } else if (platform === 'bedrock') {
-                return `<svg class="lb-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/><rect x="2" y="1" width="2" height="2" fill="#4C8232"/><rect x="7" y="0" width="2" height="2" fill="#4C8232"/><rect x="11" y="2" width="2" height="2" fill="#4C8232"/></svg>`;
-            } else if (platform === 'roblox') {
-                return `<svg class="lb-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`;
-            } else {
-                return `<svg class="lb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
-            }
-        }
-
-        function selectPlatform(platform) {
-            currentPlatform = platform;
-            const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' };
-            document.getElementById('platform-title').innerText = titleMap[platform];
-            document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`;
-            
-            if (platform === 'roblox') {
-                document.getElementById('roblox-inputs').style.display = 'block';
-            } else {
-                document.getElementById('roblox-inputs').style.display = 'none';
-            }
-
-            showScreen('platform-screen');
-            loadLeaderboard(platform);
-        }
-
-        async function loginWithProvider(providerName) {
-            try {
-                let provider;
-                if (providerName === 'google') provider = new firebase.auth.GoogleAuthProvider();
-                else if (providerName === 'github') provider = new firebase.auth.GithubAuthProvider();
-                else if (providerName === 'microsoft') {
-                    provider = new firebase.auth.OAuthProvider('microsoft.com');
-                    provider.setCustomParameters({ prompt: 'select_account' });
-                }
-                else if (providerName === 'discord') provider = new firebase.auth.OAuthProvider('discord.com');
-
-                const result = await auth.signInWithPopup(provider);
-                currentUser = result.user;
-                
-                document.getElementById('user-name').innerText = currentUser.displayName || "Gamer";
-                document.getElementById('user-avatar').src = currentUser.photoURL || "https://via.placeholder.com/35";
-                showScreen('dashboard-screen');
-            } catch (error) { alert(`Login failed: ` + error.message); }
-        }
-
+        function getPlatformIconSVG(p) { if(p==='minecraft')return `<svg class="lb-icon" viewBox="0 0 100 100"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`; if(p==='bedrock')return `<svg class="lb-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/></svg>`; if(p==='roblox')return `<svg class="lb-icon" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`; return `<svg class="lb-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`; }
+        
+        function selectPlatform(platform) { currentPlatform = platform; const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' }; document.getElementById('platform-title').innerText = titleMap[platform]; document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`; if (platform === 'roblox') { document.getElementById('roblox-inputs').style.display = 'block'; } else { document.getElementById('roblox-inputs').style.display = 'none'; } showScreen('platform-screen'); loadLeaderboard(platform); }
+        
+        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; document.getElementById('user-name').innerText=currentUser.displayName||"Gamer"; document.getElementById('user-avatar').src=currentUser.photoURL||"https://via.placeholder.com/35"; showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
+        
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
         document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
         document.getElementById('microsoftLoginBtn').addEventListener('click', () => loginWithProvider('microsoft'));
         document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
+        document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; showScreen('login-screen'); });
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            auth.signOut(); currentUser = null; showScreen('login-screen');
-        });
+        function showSupportSoon() { alert("☕ The donation page is being set up and will be live tomorrow! Thank you for wanting to support AuraCard! 👑"); }
 
-        // ☕ TEMPORARY SUPPORT POPUP
-        function showSupportSoon() {
-            alert("☕ The donation page is being set up and will be live tomorrow! Thank you for wanting to support AuraCard! 👑");
-        }
-
-        // 💬 FEEDBACK MODAL FUNCTIONS
-        function openFeedbackModal() { document.getElementById('feedback-modal').classList.add('active'); }
-        function closeFeedbackModal() { 
-            document.getElementById('feedback-modal').classList.remove('active'); 
-            document.getElementById('feedback-text').value = ''; 
-        }
+        function openFeedbackModal() { document.getElementById('feedback-modal').classList.add('active'); if(currentUser && currentUser.email) { document.getElementById('feedback-email').value = currentUser.email; } }
+        function closeFeedbackModal() { document.getElementById('feedback-modal').classList.remove('active'); document.getElementById('feedback-text').value = ''; }
 
         async function submitFeedback() {
+            const email = document.getElementById('feedback-email').value.trim();
             const text = document.getElementById('feedback-text').value.trim();
-            if (!text) return alert("Please write something first!");
+            if (!text || !email) return alert("Please fill in both email and message!");
             
-            const btn = document.getElementById('submit-feedback-btn');
-            btn.innerText = "Sending...";
-            btn.disabled = true;
-
+            const btn = document.getElementById('submit-feedback-btn'); btn.innerText = "Sending..."; btn.disabled = true;
             try {
-                await db.collection('feedback').add({
-                    user: currentUser ? (currentUser.displayName || currentUser.email) : "Anonymous",
-                    uid: currentUser ? currentUser.uid : "none",
-                    message: text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                await db.collection('feedback').add({ user: currentUser ? (currentUser.displayName || currentUser.email) : "Anonymous", email: email, uid: currentUser ? currentUser.uid : "none", message: text, timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: false });
+                btn.innerText = "✅ Sent!"; setTimeout(() => { closeFeedbackModal(); btn.innerText = "Send"; btn.disabled = false; }, 2000);
+            } catch(e) { alert("Failed to send: " + e.message); btn.innerText = "Send"; btn.disabled = false; }
+        }
+
+        function openAdminModal() {
+            if (!ADMIN_EMAILS.includes(currentUser.email)) return alert("Only Dano can access this!");
+            document.getElementById('admin-modal').classList.add('active');
+            const list = document.getElementById('admin-feedback-list');
+            list.innerHTML = '<p style="color:var(--muted);">Loading feedback...</p>';
+
+            db.collection('feedback').orderBy('timestamp', 'desc').get().then((snap) => {
+                list.innerHTML = "";
+                if(snap.empty) { list.innerHTML = '<p style="color:var(--muted);">No feedback yet.</p>'; return; }
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    list.innerHTML += `
+                        <div style="background: #15151a; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333;">
+                            <p style="margin: 0 0 5px 0; font-size: 12px; color: var(--accent);"><b>From:</b> ${d.email}</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px;">${d.message}</p>
+                            <input type="text" id="reply-${doc.id}" placeholder="Type reply..." style="width: 100%; padding: 8px; background: #0f0f13; border: 1px solid #333; color: white; border-radius: 5px; margin-bottom: 5px;">
+                            <button onclick="sendReply('${doc.id}', '${d.email}')" style="background: var(--green); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Send Reply</button>
+                        </div>
+                    `;
                 });
-                
-                btn.innerText = "✅ Sent!";
-                setTimeout(() => {
-                    closeFeedbackModal();
-                    btn.innerText = "Send";
-                    btn.disabled = false;
-                }, 2000);
-            } catch(e) {
-                console.error("Feedback Error: ", e);
-                alert("Failed to send feedback: " + e.message);
-                btn.innerText = "Send";
-                btn.disabled = false;
-            }
+            });
+        }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.remove('active'); }
+
+        async function sendReply(docId, toEmail) {
+            const replyText = document.getElementById(`reply-${docId}`).value;
+            if (!replyText) return alert("Type a reply first!");
+            try {
+                const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/send_reply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to_email: toEmail, reply_message: replyText }) });
+                const data = await res.json();
+                if(data.success) { alert("✅ Email sent successfully!"); document.getElementById(`reply-${docId}`).value = ""; } else { alert("Error: " + data.error); }
+            } catch(e) { alert("Error: " + e.message); }
         }
 
-        document.getElementById('openCreateModal').addEventListener('click', () => {
-            document.getElementById('create-modal').classList.add('active');
-            document.getElementById('validation-error').style.display = 'none';
-            document.getElementById('input-username').value = "";
-            document.getElementById('input-game').value = "Rivals";
-            document.getElementById('input-won').value = "";
-            window.realData = null;
-            window.generatedCardData = null;
-        });
-
+        document.getElementById('openCreateModal').addEventListener('click', () => { document.getElementById('create-modal').classList.add('active'); document.getElementById('validation-error').style.display = 'none'; document.getElementById('input-username').value = ""; window.realData = null; window.generatedCardData = null; });
         function closeModal() { document.getElementById('create-modal').classList.remove('active'); }
+        function closeViewer() { funkPlayer.pause(); updateMusicUI(false); document.getElementById('card-viewer').classList.remove('active'); document.getElementById('large-preview').style.display = 'none'; document.getElementById('upload-success').style.display = 'none'; document.getElementById('uploadBtn').style.display = 'block'; document.getElementById('shareBtn').style.display = 'none'; }
         
-        function closeViewer() { 
-            funkPlayer.pause();
-            updateMusicUI(false);
-            document.getElementById('card-viewer').classList.remove('active');
-            document.getElementById('large-preview').style.display = 'none';
-            document.getElementById('upload-success').style.display = 'none';
-            document.getElementById('downloadBtn').innerText = "📥 Download PNG";
-            document.getElementById('uploadBtn').innerText = "🚀 Upload to AuraCard";
-            document.getElementById('uploadBtn').disabled = false;
-            document.getElementById('uploadBtn').style.display = 'block';
-            document.getElementById('shareBtn').style.display = 'none';
-        }
-
-        document.getElementById('validateBtn').addEventListener('click', async () => {
+        async function validateAndGenerate() {
             const username = document.getElementById('input-username').value.trim();
             if (!username) return alert("Please enter a username.");
-            
-            const btn = document.getElementById('validateBtn');
-            const err = document.getElementById('validation-error');
-            btn.innerText = "Fetching Data...";
-            err.style.display = 'none';
-
+            const btn = document.getElementById('validateBtn'); const err = document.getElementById('validation-error'); btn.innerText = "Fetching..."; err.style.display = 'none';
             let isValid = false;
-
             try {
-                if (currentPlatform === 'roblox') {
-                    const manualGame = document.getElementById('input-game').value.trim() || "Rivals";
-                    const manualWon = document.getElementById('input-won').value.trim() || "0";
-
-                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/roblox_stats', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: username, most_played_game: manualGame, games_won: manualWon })
-                    });
-                    const data = await res.json();
-                    if (data.success) { isValid = true; window.realData = data; } 
-                    else { err.innerText = data.error; err.style.display = 'block'; }
-                } 
-                else if (currentPlatform === 'youtube') {
-                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/yt_stats', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: username })
-                    });
-                    const data = await res.json();
-                    if (data.success) { isValid = true; window.realData = data; } 
-                    else { err.innerText = data.error; err.style.display = 'block'; }
-                }
-                else if (currentPlatform === 'minecraft') {
-                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/java_skin', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: username })
-                    });
-                    const data = await res.json();
-                    if (data.success) { isValid = true; window.realData = data; } 
-                    else { err.innerText = data.error; err.style.display = 'block'; }
-                } 
-                else if (currentPlatform === 'bedrock') {
-                    const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/bedrock_stats', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: username })
-                    });
-                    const data = await res.json();
-                    if (data.success) { isValid = true; window.realData = data; } 
-                    else { err.innerText = data.error; err.style.display = 'block'; }
-                }
-            } catch (e) { 
-                console.error(e); 
-                err.innerText = "Cannot connect to Backend."; err.style.display = 'block';
-            }
-
-            btn.innerText = "Validate";
-            
-            if (isValid) {
-                validatedUsername = username;
-                closeModal();
-                await generateCard(); 
-            }
-        });
+                let url = ''; let body = { username: username };
+                if (currentPlatform === 'roblox') { url = 'https://auracard-backend-kzgy.onrender.com/api/roblox_stats'; body.most_played_game = document.getElementById('input-game').value.trim() || "Rivals"; body.games_won = document.getElementById('input-won').value.trim() || "0"; }
+                else if (currentPlatform === 'youtube') { url = 'https://auracard-backend-kzgy.onrender.com/api/yt_stats'; }
+                else if (currentPlatform === 'minecraft') { url = 'https://auracard-backend-kzgy.onrender.com/api/java_skin'; }
+                else if (currentPlatform === 'bedrock') { url = 'https://auracard-backend-kzgy.onrender.com/api/bedrock_stats'; }
+                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                const data = await res.json();
+                if (data.success) { isValid = true; window.realData = data; } else { err.innerText = data.error; err.style.display = 'block'; }
+            } catch (e) { err.innerText = "Cannot connect to Backend."; err.style.display = 'block'; }
+            btn.innerText = "Validate"; if (isValid) { validatedUsername = username; closeModal(); await generateCard(); }
+        }
 
         async function generateCard() {
-            let stat1, stat2, stat3, stat4, stat5, bio, title, titleColor;
-            let label1, label2, label3, label4, label5;
-
+            let stat1, stat2, stat3, stat4, stat5, bio, title, titleColor, label1, label2, label3, label4, label5;
             if (window.realData) {
-                const d = window.realData;
-                title = d.title || "Player";
-                titleColor = (d.aura_level >= 100) ? '#ffd700' : '#00e5ff';
-                bio = d.description || "No bio set.";
-                
-                if (currentPlatform === 'roblox') {
-                    stat1 = d.games_played || "0";
-                    stat2 = d.games_won || "0";
-                    stat3 = d.aura_streak || "0x";
-                    stat4 = d.most_played_game || "Rivals"; 
-                    stat5 = d.friends !== undefined ? d.friends : "0";
-                    label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS";
-                } else if (currentPlatform === 'youtube') {
-                    stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level);
-                    stat2 = d.subs.toLocaleString();
-                    stat3 = d.views.toLocaleString();
-                    stat4 = "YouTube";
-                    stat5 = "Creator";
-                    label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS";
-                } else {
-                    // 🧱 MINECRAFT JAVA & BEDROCK (Real Stats)
-                    stat1 = d.blocks_mined || "0";
-                    stat2 = d.mobs_killed || "0";
-                    stat3 = d.diamonds_found || "0";
-                    stat4 = currentPlatform.toUpperCase();
-                    stat5 = d.playtime || "0 Hours";
-                    label1 = "BLOCKS MINED"; label2 = "MOBS KILLED"; label3 = "DIAMONDS"; label4 = "PLATFORM"; label5 = "PLAYTIME";
-                }
-
-                if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } 
-                else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } 
-                else { funkPlayer.src = FUNK_LOW; }
+                const d = window.realData; title = d.title || "Player"; titleColor = (d.aura_level >= 100) ? '#ffd700' : '#00e5ff'; bio = d.description || "No bio set.";
+                if (currentPlatform === 'roblox') { stat1 = d.games_played || "0"; stat2 = d.games_won || "0"; stat3 = d.aura_streak || "0x"; stat4 = d.most_played_game || "Rivals"; stat5 = d.friends !== undefined ? d.friends : "0"; label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS"; }
+                else if (currentPlatform === 'youtube') { stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level); stat2 = d.subs.toLocaleString(); stat3 = d.views.toLocaleString(); stat4 = "YouTube"; stat5 = "Creator"; label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS"; }
+                else { stat1 = d.blocks_mined || "0"; stat2 = d.mobs_killed || "0"; stat3 = d.diamonds_found || "0"; stat4 = currentPlatform.toUpperCase(); stat5 = d.playtime || "0 Hours"; label1 = "BLOCKS MINED"; label2 = "MOBS KILLED"; label3 = "DIAMONDS"; label4 = "PLATFORM"; label5 = "PLAYTIME"; }
+                if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } else { funkPlayer.src = FUNK_LOW; }
             }
-
-            funkPlayer.load();
-            tryAutoplayMusic();
-
-            const canvas = document.getElementById('card-canvas');
-            canvas.width = 900; canvas.height = 600;
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#0f0f13'; ctx.fillRect(0, 0, 900, 600);
-            ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, 880, 580);
-
+            funkPlayer.load(); tryAutoplayMusic();
+            const canvas = document.getElementById('card-canvas'); canvas.width = 900; canvas.height = 600; const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0f0f13'; ctx.fillRect(0, 0, 900, 600); ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, 880, 580);
             ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 50px "Montserrat", sans-serif'; ctx.fillText("AURACARD", 50, 80);
             ctx.fillStyle = '#fff'; ctx.font = 'bold 30px "Montserrat", sans-serif'; ctx.fillText(validatedUsername, 50, 130);
             ctx.fillStyle = titleColor; ctx.font = 'bold 20px "Roboto", sans-serif'; ctx.fillText(title.toUpperCase(), 50, 160);
-
-            if (window.realData && window.realData.avatar_url) {
-                const avatarImg = await loadImage(window.realData.avatar_url);
-                if (avatarImg) {
-                    const centerX = 740, centerY = 280;
-                    const gradient = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, 200);
-                    gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                    ctx.fillStyle = gradient; ctx.fillRect(centerX - 200, centerY - 200, 400, 400);
-
-                    ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(centerX, centerY + 120, 100, 25, 0, 0, Math.PI * 2); ctx.stroke();
-                    
-                    const avatarSize = 300;
-                    ctx.drawImage(avatarImg, centerX - (avatarSize/2), centerY - (avatarSize/2) - 20, avatarSize, avatarSize);
-                }
-            }
-
-            ctx.fillStyle = '#191920'; ctx.fillRect(50, 380, 800, 180);
-            ctx.strokeStyle = '#32323c'; ctx.strokeRect(50, 380, 800, 180);
-
-            ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; 
-            ctx.fillText(label1, 80, 410); ctx.fillText(label2, 300, 410); ctx.fillText(label3, 520, 410);
-            
-            ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 28px "Montserrat", sans-serif'; ctx.fillText(stat1, 80, 440);
-            ctx.fillStyle = '#ff6464'; ctx.fillText(stat2, 300, 440);
-            ctx.fillStyle = '#fff'; ctx.fillText(stat3, 520, 440);
-
-            ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; 
-            ctx.fillText(label4, 80, 490); ctx.fillText(label5, 300, 490);
-            
-            ctx.fillStyle = '#ffd700'; ctx.font = 'bold 24px "Montserrat", sans-serif'; ctx.fillText(stat4, 80, 520);
-            ctx.fillStyle = '#fff'; ctx.fillText(stat5, 300, 520);
-
-            ctx.fillStyle = '#a0a0a5'; ctx.font = '16px "Roboto", sans-serif';
-            let words = bio.split(' '), line = '', y = 210;
-            for(let n = 0; n < words.length; n++) {
-              let testLine = line + words[n] + ' ';
-              if (ctx.measureText(testLine).width > 450 && n > 0) { ctx.fillText(line, 50, y); line = words[n] + ' '; y += 24; } 
-              else { line = testLine; }
-            }
-            ctx.fillText(line, 50, y);
-
-            const largePreview = document.getElementById('large-preview');
-            
-            const compressedImage = canvas.toDataURL('image/jpeg', 0.8);
-            largePreview.src = compressedImage;
-            largePreview.style.display = 'block';
-            
-            document.getElementById('card-viewer').classList.add('active');
-            
-            document.getElementById('viewer-actions').style.display = 'flex';
-            document.getElementById('uploadBtn').style.display = 'block';
-            document.getElementById('shareBtn').style.display = 'none';
-
-            window.generatedCardData = {
-                image: compressedImage,
-                platform: currentPlatform,
-                username: validatedUsername,
-                level: parseInt(String(stat1).replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0,
-                bio: bio
-            };
+            if (window.realData && window.realData.avatar_url) { const avatarImg = await loadImage(window.realData.avatar_url); if (avatarImg) { const centerX = 740, centerY = 280; const gradient = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, 200); gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); ctx.fillStyle = gradient; ctx.fillRect(centerX - 200, centerY - 200, 400, 400); ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(centerX, centerY + 120, 100, 25, 0, 0, Math.PI * 2); ctx.stroke(); const avatarSize = 300; ctx.drawImage(avatarImg, centerX - (avatarSize/2), centerY - (avatarSize/2) - 20, avatarSize, avatarSize); } }
+            ctx.fillStyle = '#191920'; ctx.fillRect(50, 380, 800, 180); ctx.strokeStyle = '#32323c'; ctx.strokeRect(50, 380, 800, 180);
+            ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; ctx.fillText(label1, 80, 410); ctx.fillText(label2, 300, 410); ctx.fillText(label3, 520, 410);
+            ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 28px "Montserrat", sans-serif'; ctx.fillText(stat1, 80, 440); ctx.fillStyle = '#ff6464'; ctx.fillText(stat2, 300, 440); ctx.fillStyle = '#fff'; ctx.fillText(stat3, 520, 440);
+            ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; ctx.fillText(label4, 80, 490); ctx.fillText(label5, 300, 490);
+            ctx.fillStyle = '#ffd700'; ctx.font = 'bold 24px "Montserrat", sans-serif'; ctx.fillText(stat4, 80, 520); ctx.fillStyle = '#fff'; ctx.fillText(stat5, 300, 520);
+            ctx.fillStyle = '#a0a0a5'; ctx.font = '16px "Roboto", sans-serif'; let words = bio.split(' '), line = '', y = 210; for(let n = 0; n < words.length; n++) { let testLine = line + words[n] + ' '; if (ctx.measureText(testLine).width > 450 && n > 0) { ctx.fillText(line, 50, y); line = words[n] + ' '; y += 24; } else { line = testLine; } } ctx.fillText(line, 50, y);
+            const largePreview = document.getElementById('large-preview'); const compressedImage = canvas.toDataURL('image/jpeg', 0.8); largePreview.src = compressedImage; largePreview.style.display = 'block';
+            document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'block'; document.getElementById('shareBtn').style.display = 'none';
+            window.generatedCardData = { image: compressedImage, platform: currentPlatform, username: validatedUsername, level: parseInt(String(stat1).replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0, bio: bio };
         }
+        function loadImage(url) { return new Promise((resolve) => { const img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = url; }); }
 
-        function loadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "Anonymous";
-                img.onload = () => resolve(img);
-                img.onerror = () => resolve(null); 
-                img.src = url;
-            });
-        }
-
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            if (!window.generatedCardData) return;
-            const link = document.createElement('a');
-            link.download = `${window.generatedCardData.username}_AuraCard.jpg`;
-            link.href = window.generatedCardData.image;
-            link.click();
-        });
-
-        document.getElementById('uploadBtn').addEventListener('click', async () => {
-            if (!window.generatedCardData || !db || !currentUser) return;
-            
-            const btn = document.getElementById('uploadBtn');
-            btn.innerText = "Uploading..."; 
-            btn.disabled = true;
-
-            try {
-                const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`;
-
-                const uploadPromise = db.collection('auracards').doc(uniqueDocId).set({
-                    user: currentUser.uid, 
-                    platform: window.generatedCardData.platform, 
-                    username: window.generatedCardData.username,
-                    wins: window.generatedCardData.level, 
-                    bio: window.generatedCardData.bio, 
-                    image: window.generatedCardData.image, 
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error("Upload timed out! Check your Firebase rules.")), 10000)
-                );
-
-                await Promise.race([uploadPromise, timeoutPromise]);
-                
-                document.getElementById('upload-success').style.display = 'block';
-                btn.innerText = "✅ Uploaded!";
-                
-                document.getElementById('shareBtn').style.display = 'flex';
-                
-                setTimeout(() => { 
-                    closeViewer(); 
-                    loadLeaderboard(currentPlatform); 
-                }, 2500);
-                
-            } catch(e) { 
-                console.error("DB Error: ", e);
-                alert("Upload failed: " + e.message); 
-                btn.innerText = "🚀 Upload"; 
-                btn.disabled = false; 
-            }
-        });
-
-        document.getElementById('shareBtn').addEventListener('click', async () => {
-            if (!window.generatedCardData) return;
-            
-            const shareData = {
-                title: 'AuraCard',
-                text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`,
-                url: 'https://auracard.isroot.in'
-            };
-
-            try {
-                if (navigator.share) {
-                    await navigator.share(shareData);
-                } else {
-                    await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`);
-                    alert("Link copied to clipboard! Share it with your friends.");
-                }
-            } catch (err) {
-                console.log('Error sharing:', err);
-            }
-        });
+        document.getElementById('downloadBtn').addEventListener('click', () => { if (!window.generatedCardData) return; const link = document.createElement('a'); link.download = `${window.generatedCardData.username}_AuraCard.jpg`; link.href = window.generatedCardData.image; link.click(); });
+        document.getElementById('uploadBtn').addEventListener('click', async () => { if (!window.generatedCardData || !db || !currentUser) return; const btn = document.getElementById('uploadBtn'); btn.innerText = "Uploading..."; btn.disabled = true; try { const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`; await db.collection('auracards').doc(uniqueDocId).set({ user: currentUser.uid, platform: window.generatedCardData.platform, username: window.generatedCardData.username, wins: window.generatedCardData.level, bio: window.generatedCardData.bio, image: window.generatedCardData.image, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); document.getElementById('upload-success').style.display = 'block'; btn.innerText = "✅ Uploaded!"; document.getElementById('shareBtn').style.display = 'flex'; setTimeout(() => { closeViewer(); loadLeaderboard(currentPlatform); }, 2500); } catch(e) { alert("Upload failed: " + e.message); btn.innerText = "🚀 Upload"; btn.disabled = false; } });
+        document.getElementById('shareBtn').addEventListener('click', async () => { if (!window.generatedCardData) return; const shareData = { title: 'AuraCard', text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`, url: 'https://auracard.isroot.in' }; try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`); alert("Link copied!"); } } catch (err) {} });
 
         function loadLeaderboard(platform) {
-            const list = document.getElementById('leaderboard-content');
-            list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`;
-            if (!db) return;
-            
-            db.collection('auracards').where('platform', '==', platform).orderBy('wins', 'desc').limit(10).get()
-              .then((snap) => {
-                  list.innerHTML = "";
-                  if (snap.empty) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
-                  
-                  let rank = 1;
-                  snap.forEach((doc) => {
-                      const data = doc.data();
-                      
-                      window.leaderboardCache[doc.id] = data;
+            const list = document.getElementById('leaderboard-content'); list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`; if (!db) return;
+            db.collection('auracards').where('platform', '==', platform).orderBy('wins', 'desc').limit(10).get().then((snap) => {
+                list.innerHTML = ""; if (snap.empty) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
+                let rank = 1; snap.forEach((doc) => {
+                    const data = doc.data(); window.leaderboardCache[doc.id] = data;
+                    
+                    const isDev = DEV_USERNAMES.includes(data.username.toLowerCase()) || ADMIN_EMAILS.includes(data.user);
+                    
+                    const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
+                    const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
+                    
+                    let crown = rank === 1 ? '👑' : '';
+                    let rowClass = rank === 1 ? 'lb-card rank-1' : 'lb-card';
+                    let devBadge = '';
 
-                      const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
-                      const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
-                      const crown = rank === 1 ? '👑' : '';
-                      const rowClass = rank === 1 ? 'lb-card rank-1' : 'lb-card';
-                      const iconSVG = getPlatformIconSVG(data.platform);
+                    if (isDev) {
+                        rowClass = 'lb-card dev-card';
+                        devBadge = `<span style="background: var(--accent); color: #000; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 900;">DEV</span>`;
+                        crown = '🛠️';
+                    }
 
-                      list.innerHTML += `
-                        <div class="${rowClass}" onclick="viewLeaderboardCard('${doc.id}')">
-                            <div class="lb-left">
-                                <span class="lb-rank">${crown} #${rank}</span>
-                                ${iconSVG}
-                                <span class="lb-name">${data.username}</span>
-                            </div>
-                            <span class="lb-level" style="color: ${color};">${winLabel}</span>
-                        </div>
-                      `;
-                      rank++;
-                  });
-              }).catch((err) => { 
-                  console.error("Leaderboard Error: ", err);
-                  const match = err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/);
-                  if (match) {
-                      list.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 16px;">Database index needed!<br><br><a href="${match[0]}" target="_blank" style="color: #00e5ff; font-weight: bold; text-decoration: underline;">CLICK HERE TO CREATE IT</a></p>`;
-                  } else {
-                      list.innerHTML = `<p style="text-align: center; color: #ff5252;">Database index needed. Please create it in Firebase.</p>`;
-                  }
-              });
+                    const iconSVG = getPlatformIconSVG(data.platform);
+                    list.innerHTML += `<div class="${rowClass}" onclick="viewLeaderboardCard('${doc.id}')"><div class="lb-left"><span class="lb-rank">${crown} #${rank}</span>${iconSVG}<span class="lb-name">${data.username} ${devBadge}</span></div><span class="lb-level" style="color: ${color};">${winLabel}</span></div>`; rank++;
+                });
+            }).catch((err) => { list.innerHTML = `<p style="text-align: center; color: #ff5252;">Database index needed. Please create it in Firebase.</p>`; });
         }
 
         function viewLeaderboardCard(docId) {
-            const data = window.leaderboardCache[docId];
-            if (!data) return;
-
-            if (!data.image) {
-                alert("This card was uploaded before the image update and doesn't have a saved picture. Create a new one!");
-                return;
-            }
-
-            window.generatedCardData = {
-                image: data.image,
-                username: data.username,
-                platform: data.platform,
-                level: data.wins,
-                bio: data.bio
-            };
-
-            const largePreview = document.getElementById('large-preview');
-            largePreview.src = data.image;
-            largePreview.style.display = 'block';
-            
-            document.getElementById('card-viewer').classList.add('active');
-            
-            document.getElementById('viewer-actions').style.display = 'flex';
-            document.getElementById('uploadBtn').style.display = 'none'; 
-            document.getElementById('shareBtn').style.display = 'flex';
-            document.getElementById('upload-success').style.display = 'none';
+            const data = window.leaderboardCache[docId]; if (!data) return;
+            if (!data.image) { alert("This card doesn't have a saved picture. Create a new one!"); return; }
+            window.generatedCardData = { image: data.image, username: data.username, platform: data.platform, level: data.wins, bio: data.bio };
+            const largePreview = document.getElementById('large-preview'); largePreview.src = data.image; largePreview.style.display = 'block';
+            document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'none'; document.getElementById('shareBtn').style.display = 'flex'; document.getElementById('upload-success').style.display = 'none';
         }
 
         auth.onAuthStateChanged((user) => {
             if (user) {
-                currentUser = user; document.getElementById('user-name').innerText = user.displayName || "Gamer";
-                document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35"; showScreen('dashboard-screen');
+                currentUser = user; document.getElementById('user-name').innerText = user.displayName || "Gamer"; document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
+                if (ADMIN_EMAILS.includes(user.email)) { document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); }
+                showScreen('dashboard-screen');
             } else { showScreen('login-screen'); }
         });
     </script>
