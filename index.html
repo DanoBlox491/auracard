@@ -6,10 +6,10 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- 🚀 SEO UPGRADE: Title and Meta Tags -->
-    <title>AuraCard | Free Gaming Aura Cards for Roblox, Minecraft & YouTube</title>
-    <meta name="description" content="Generate your free AuraCard for Roblox, Minecraft Java, Minecraft Bedrock, and YouTube. Calculate your Gamer Aura, show off your stats, and climb the leaderboard!">
-    <meta name="keywords" content="AuraCard, Gamer Aura, Roblox Aura, Minecraft Stats, YouTube Stats, Gaming Leaderboard, Dano, Aura Card Generator">
+    <!-- 🚀 SEO UPGRADE: #1 Gaming Brand -->
+    <title>AuraCard | The #1 Gaming Aura Card for Roblox, Minecraft & YouTube</title>
+    <meta name="description" content="AuraCard is the ultimate gaming profile brand. Generate custom stat cards for Roblox, Minecraft Java, Minecraft Bedrock, and YouTube. Show off your Gamer Aura and climb the global leaderboard!">
+    <meta name="keywords" content="AuraCard, Gamer Aura, Roblox Aura Card, Minecraft Aura Card, YouTube Aura Card, Gaming Leaderboard, Dano">
     <meta name="author" content="Dano">
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
@@ -18,8 +18,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 3.6 (UI Fix & Icons Restored)
-        const CURRENT_VERSION = "3.6"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 3.9 (Email Auth Update)
+        const CURRENT_VERSION = "3.9"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -33,7 +33,16 @@
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .screen.active { display: flex; }
 
-        /* 🛠️ NAVBAR FIX: Added flex-wrap and gap so it doesn't squeeze */
+        .landing-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; text-align: center; }
+        .landing-title { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--accent); font-size: 60px; margin: 0; text-shadow: 0 0 20px rgba(0,229,255,0.4); }
+        .landing-subtitle { color: var(--muted); font-size: 20px; margin-top: 10px; margin-bottom: 50px; }
+        .landing-buttons { display: flex; gap: 20px; }
+        .landing-btn { padding: 15px 40px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; font-family: 'Montserrat', sans-serif; }
+        .btn-login { background: var(--accent); color: #000; }
+        .btn-login:hover { background: #00b8cc; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,229,255,0.2); }
+        .btn-signup { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-signup:hover { background: rgba(0, 229, 255, 0.1); transform: translateY(-3px); }
+
         .navbar { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--panel); border-radius: 12px; box-sizing: border-box; margin-bottom: 20px; border: 1px solid #333; flex-wrap: wrap; gap: 10px; }
         .nav-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); }
         .nav-user { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
@@ -45,8 +54,18 @@
         .showcase-btn { background: #ff0000; border: none; color: #fff; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; }
         .logout-btn { background: transparent; border: 1px solid #ff5252; color: #ff5252; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
 
-        .login-box { background: var(--panel); padding: 40px; border-radius: 16px; text-align: center; border-top: 5px solid var(--accent); max-width: 400px; width: 100%; margin-top: 10vh; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
+        /* 🚀 EMAIL AUTH FORM STYLES */
+        .auth-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .auth-input { width: 100%; padding: 12px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; font-size: 16px; }
+        .auth-submit-btn { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .auth-submit-btn:hover { background: #00b8cc; }
+        .auth-toggle-link { color: var(--muted); font-size: 14px; margin-top: 15px; cursor: pointer; text-decoration: underline; }
+        .auth-divider { display: flex; align-items: center; text-align: center; margin: 20px 0; color: var(--muted); font-size: 12px; }
+        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-bottom: 1px solid #333; }
+        .auth-divider::before { margin-right: 10px; }
+        .auth-divider::after { margin-left: 10px; }
+
+        .auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
         .btn-google { background: white; color: #333; }
         .btn-github { background: #24292e; color: white; border: 1px solid #444; }
         .btn-ms { background: #0078d4; color: white; }
@@ -57,7 +76,6 @@
         .platform-card { background: var(--panel); padding: 30px; border-radius: 16px; width: 200px; text-align: center; cursor: pointer; border: 2px solid #333; transition: 0.3s; }
         .platform-card:hover { border-color: var(--accent); transform: translateY(-5px); }
         
-        /* 🎨 RESTORED ICON STYLE */
         .platform-logo { width: 85px; height: 85px; margin-bottom: 15px; object-fit: contain; display: inline-block; vertical-align: middle; filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.5)); }
         
         .platform-card h3 { margin: 0; font-family: 'Montserrat', sans-serif; }
@@ -82,7 +100,7 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--panel); padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; border-top: 5px solid var(--accent); max-height: 85vh; overflow-y: auto; }
-        .modal h2 { margin-top: 0; color: var(--accent); font-family: 'Montserrat', sans-serif; }
+        .modal h2 { margin-top: 0; color: var(--accent); font-family: 'Montserrat', sans-serif; text-align: center; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--muted); }
         .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #15151a; border: 1px solid #3a3a45; color: white; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
@@ -97,7 +115,6 @@
         .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; }
         .music-toggle { position: absolute; top: 30px; left: 40px; background: #ff5252; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* 🚀 SEO FOOTER */
         .seo-footer { width: 100%; max-width: 800px; margin-top: 40px; margin-bottom: 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 20px; border-top: 1px solid #333; }
         .seo-footer h1 { font-size: 16px; color: var(--text); }
     </style>
@@ -106,15 +123,42 @@
 
     <audio id="funkPlayer" loop preload="auto"></audio>
 
-    <!-- SCREEN 1: LOGIN -->
+    <!-- SCREEN 1: LANDING PAGE -->
     <div id="login-screen" class="screen active">
-        <div class="login-box">
-            <h1 style="font-family: 'Montserrat'; font-weight: 900; color: var(--accent); font-size: 40px; margin-bottom: 10px;">AuraCard</h1>
-            <p style="color: var(--muted); margin-bottom: 30px;">Sign in to access your cross-game profile.</p>
-            <button class="auth-btn btn-google" id="googleLoginBtn"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Sign in with Google</button>
-            <button class="auth-btn btn-github" id="githubLoginBtn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Sign in with GitHub</button>
-            <button class="auth-btn btn-ms" id="microsoftLoginBtn">Sign in with Microsoft / Xbox</button>
-            <button class="auth-btn btn-discord" id="discordLoginBtn">Sign in with Discord</button>
+        <div class="landing-container">
+            <h1 class="landing-title">AuraCard</h1>
+            <p class="landing-subtitle">Show your aura to the internet!</p>
+            
+            <div class="landing-buttons">
+                <button class="landing-btn btn-login" onclick="openAuthModal('login')">Log In</button>
+                <button class="landing-btn btn-signup" onclick="openAuthModal('signup')">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔐 AUTH MODAL -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal" style="text-align: center;">
+            <h2 id="auth-modal-title">Log In</h2>
+            
+            <!-- 📧 CUSTOM EMAIL/PASSWORD AUTH -->
+            <div class="auth-input-group">
+                <input type="text" id="auth-email" class="auth-input" placeholder="Username or Email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password">
+            </div>
+            <button class="auth-submit-btn" id="email-auth-btn" onclick="handleEmailAuth()">Log In</button>
+            <p class="auth-toggle-link" id="auth-toggle-link" onclick="toggleAuthMode()">Don't have an account? Sign Up</p>
+
+            <div class="auth-divider">OR CONTINUE WITH</div>
+            
+            <button class="auth-btn btn-google" id="googleLoginBtn"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Continue with Google</button>
+            <button class="auth-btn btn-discord" id="discordLoginBtn">Continue with Discord</button>
+            <button class="auth-btn btn-github" id="githubLoginBtn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Continue with GitHub</button>
+            <button class="auth-btn btn-ms" id="microsoftLoginBtn">Continue with Microsoft / Xbox</button>
+            
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button onclick="closeAuthModal()" style="background: #333; color: white;">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -136,7 +180,6 @@
             <h2 style="text-align: center; font-family: 'Montserrat';">Select Your Platform</h2>
             <div class="platform-grid">
                 
-                <!-- 🎨 RESTORED MINECRAFT JAVA ICON -->
                 <div class="platform-card" onclick="selectPlatform('minecraft')">
                     <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/>
@@ -154,7 +197,6 @@
                     <h3>Minecraft Java</h3>
                 </div>
                 
-                <!-- 🎨 RESTORED MINECRAFT BEDROCK ICON -->
                 <div class="platform-card" onclick="selectPlatform('bedrock')">
                     <svg class="platform-logo" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
                         <rect width="16" height="16" fill="#8B5A2B"/>
@@ -179,7 +221,6 @@
                     <h3>Minecraft Bedrock</h3>
                 </div>
                 
-                <!-- 🎨 RESTORED ROBLOX ICON -->
                 <div class="platform-card" onclick="selectPlatform('roblox')">
                     <svg class="platform-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100" height="100" fill="#0074FF"/>
@@ -189,7 +230,6 @@
                     <h3>Roblox</h3>
                 </div>
                 
-                <!-- 🎨 RESTORED YOUTUBE ICON -->
                 <div class="platform-card" onclick="selectPlatform('youtube')">
                     <svg class="platform-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
@@ -200,10 +240,9 @@
                 
             </div>
             
-            <!-- 🚀 SEO BOT TEXT & TRANSPARENCY -->
             <div class="seo-footer">
-                <h1>Free Gaming Aura Card Generator</h1>
-                <p>AuraCard is the ultimate gaming profile generator. Create and download free stat cards for <b>Roblox</b> (games like Rivals), <b>Minecraft Java</b>, <b>Minecraft Bedrock</b>, and <b>YouTube</b>. Track your Gamer Aura score, show off your blocks mined, mobs killed, and diamond counts, and compete on the global leaderboard.</p>
+                <h1>AuraCard: The #1 Free Gaming Aura Card Generator</h1>
+                <p>AuraCard is the ultimate gaming profile brand. Create and download free stat cards for <b>Roblox</b> (games like Rivals), <b>Minecraft Java</b>, <b>Minecraft Bedrock</b>, and <b>YouTube</b>. Track your Gamer Aura score, show off your blocks mined, mobs killed, and diamond counts, and compete on the global leaderboard.</p>
                 <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Built by Dano (11) using HTML, Python, and Firebase. AI was used as a coding co-pilot to help learn and squash bugs!</p>
             </div>
         </div>
@@ -298,17 +337,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 🛠️ ADD YOUR OTHER EMAILS OR USERNAMES HERE!
-        const ADMIN_EMAILS = [
-            "vaishinstruz@gmail.com", 
-            "YOUR_OTHER_EMAIL_HERE@gmail.com" // <-- Put your other email here
-        ];
-
-        const DEV_USERNAMES = [
-            "dano", 
-            "danoblox491", 
-            "dano-dev" 
-        ];
+        const ADMIN_EMAILS = ["vaishinstruz@gmail.com"];
+        const DEV_USERNAMES = ["dano", "danoblox491", "dano-dev"];
 
         let currentPlatform = ""; let currentUser = null; let validatedUsername = "";
         window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
@@ -322,11 +352,66 @@
         function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
         function goToDashboard() { showScreen('dashboard-screen'); }
 
+        // 🔐 AUTH MODAL & LOGIC
+        let isSignUpMode = false;
+        
+        function openAuthModal(mode) {
+            document.getElementById('auth-modal').classList.add('active');
+            isSignUpMode = (mode === 'signup');
+            updateAuthUI();
+        }
+        
+        function closeAuthModal() { 
+            document.getElementById('auth-modal').classList.remove('active'); 
+            document.getElementById('auth-email').value = '';
+            document.getElementById('auth-password').value = '';
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Sign Up" : "Log In";
+            document.getElementById('email-auth-btn').innerText = isSignUpMode ? "Create Account" : "Log In";
+            document.getElementById('auth-toggle-link').innerText = isSignUpMode ? "Already have an account? Log In" : "Don't have an account? Sign Up";
+        }
+
+        async function handleEmailAuth() {
+            let email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const btn = document.getElementById('email-auth-btn');
+
+            if (!email || !password) return alert("Please fill in both fields!");
+
+            // 🛠️ SECRET TRICK: If they don't type an @, treat it as a username and add fake email domain
+            if (!email.includes('@')) {
+                email = email + '@auracard.user';
+            }
+
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            try {
+                if (isSignUpMode) {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                } else {
+                    await auth.signInWithEmailAndPassword(email, password);
+                }
+                closeAuthModal();
+            } catch (error) {
+                alert("Error: " + error.message);
+                btn.innerText = isSignUpMode ? "Create Account" : "Log In";
+                btn.disabled = false;
+            }
+        }
+
         function getPlatformIconSVG(p) { if(p==='minecraft')return `<svg class="lb-icon" viewBox="0 0 100 100"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`; if(p==='bedrock')return `<svg class="lb-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/></svg>`; if(p==='roblox')return `<svg class="lb-icon" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`; return `<svg class="lb-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`; }
         
         function selectPlatform(platform) { currentPlatform = platform; const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' }; document.getElementById('platform-title').innerText = titleMap[platform]; document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`; if (platform === 'roblox') { document.getElementById('roblox-inputs').style.display = 'block'; } else { document.getElementById('roblox-inputs').style.display = 'none'; } showScreen('platform-screen'); loadLeaderboard(platform); }
         
-        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; document.getElementById('user-name').innerText=currentUser.displayName||"Gamer"; document.getElementById('user-avatar').src=currentUser.photoURL||"https://via.placeholder.com/35"; showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
+        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
         
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
         document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
@@ -477,8 +562,17 @@
 
         auth.onAuthStateChanged((user) => {
             if (user) {
-                currentUser = user; document.getElementById('user-name').innerText = user.displayName || "Gamer"; document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
-                if (ADMIN_EMAILS.includes(user.email)) { document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); }
+                currentUser = user; 
+                let displayName = user.displayName;
+                if (!displayName && user.email) {
+                    displayName = user.email.split('@')[0]; // If they used a username, show that
+                }
+                document.getElementById('user-name').innerText = displayName || "Gamer"; 
+                document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
+                
+                if (ADMIN_EMAILS.includes(user.email)) { 
+                    document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); 
+                }
                 showScreen('dashboard-screen');
             } else { showScreen('login-screen'); }
         });
