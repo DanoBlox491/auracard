@@ -26,8 +26,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 4.1 (Guest Mode & Background)
-        const CURRENT_VERSION = "4.1"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 4.3 (Guest Read Fix)
+        const CURRENT_VERSION = "4.3"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -45,7 +45,7 @@
             background-size: cover; background-position: center;
             filter: blur(8px) brightness(0.3);
             z-index: -1;
-            transform: scale(1.1); /* Prevents white edges from blur */
+            transform: scale(1.1);
         }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; position: relative; z-index: 1; }
@@ -103,7 +103,6 @@
         .add-btn { background: var(--accent); color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
         .add-btn:hover { transform: scale(1.1); }
         
-        /* 🔍 SEARCH BAR STYLES */
         .search-container { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
         .search-input { flex: 1; padding: 12px; background: rgba(30, 30, 36, 0.9); border: 1px solid #333; color: white; border-radius: 8px; font-family: 'Roboto', sans-serif; font-size: 16px; backdrop-filter: blur(10px); }
         .search-btn { padding: 12px 20px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
@@ -291,7 +290,6 @@
         </div>
         <div class="platform-view" style="width: 100%; max-width: 800px;">
             
-            <!-- 🔍 SEARCH BAR -->
             <div class="search-container">
                 <input type="text" id="search-input" class="search-input" placeholder="Search a username to view their card...">
                 <button class="search-btn" onclick="searchUser()">Search</button>
@@ -299,7 +297,6 @@
 
             <div class="top-bar">
                 <h2 style="font-family: 'Montserrat'; margin: 0;" id="platform-leaderboard-title">Top Aura Farmers</h2>
-                <!-- 🚫 Guest Notice -->
                 <button class="add-btn" id="openCreateModal" onclick="checkIfGuest()">+</button>
             </div>
             <div class="leaderboard-list" id="leaderboard-content"><p style="text-align: center; color: var(--muted);">Loading...</p></div>
@@ -379,7 +376,7 @@
         const DEV_USERNAMES = ["dano", "danoblox491", "dano-dev"];
 
         let currentPlatform = ""; let currentUser = null; let validatedUsername = "";
-        let isGuest = false; // 👤 Guest Mode Flag
+        let isGuest = false;
         window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
         const funkPlayer = document.getElementById('funkPlayer');
         const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; const FUNK_HIGH = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
@@ -459,6 +456,7 @@
                     await auth.signInWithEmailAndPassword(email, password);
                 }
                 isGuest = false;
+                localStorage.setItem('auracard_last_login', Date.now()); // Save login time
                 closeAuthModal();
             } catch (error) {
                 alert("Error: " + error.message);
@@ -471,13 +469,13 @@
         
         function selectPlatform(platform) { currentPlatform = platform; const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' }; document.getElementById('platform-title').innerText = titleMap[platform]; document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`; if (platform === 'roblox') { document.getElementById('roblox-inputs').style.display = 'block'; } else { document.getElementById('roblox-inputs').style.display = 'none'; } showScreen('platform-screen'); loadLeaderboard(platform); }
         
-        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; isGuest = false; closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
+        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; isGuest = false; localStorage.setItem('auracard_last_login', Date.now()); closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
         
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
         document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
         document.getElementById('microsoftLoginBtn').addEventListener('click', () => loginWithProvider('microsoft'));
         document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
-        document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; isGuest = false; showScreen('login-screen'); });
+        document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; isGuest = false; localStorage.removeItem('auracard_last_login'); showScreen('login-screen'); });
 
         function showSupportSoon() { alert("☕ The donation page is being set up and will be live tomorrow! Thank you for wanting to support AuraCard! 👑"); }
 
@@ -631,7 +629,15 @@
                     const iconSVG = getPlatformIconSVG(data.platform);
                     list.innerHTML += `<div class="${rowClass}" onclick="viewLeaderboardCard('${doc.id}')"><div class="lb-left"><span class="lb-rank">${crown} #${rank}</span>${iconSVG}<span class="lb-name">${data.username} ${devBadge}</span></div><span class="lb-level" style="color: ${color};">${winLabel}</span></div>`; rank++;
                 });
-            }).catch((err) => { list.innerHTML = `<p style="text-align: center; color: #ff5252;">Database index needed. Please create it in Firebase.</p>`; });
+            }).catch((err) => { 
+                console.error(err);
+                const match = err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/);
+                if (match) {
+                    list.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 16px;">Database index needed!<br><br><a href="${match[0]}" target="_blank" style="color: #00e5ff; font-weight: bold; text-decoration: underline;">CLICK HERE TO CREATE IT</a></p>`;
+                } else {
+                    list.innerHTML = `<p style="text-align: center; color: #ff5252;">Error: ${err.message}</p>`; // Show the real error!
+                }
+            });
         }
 
         function viewLeaderboardCard(docId) {
@@ -642,10 +648,27 @@
             document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'none'; document.getElementById('shareBtn').style.display = 'flex'; document.getElementById('upload-success').style.display = 'none';
         }
 
+        // 🚀 AUTO-LOGIN & 5-DAY TIMEOUT LOGIC
         auth.onAuthStateChanged((user) => {
-            if (isGuest) return; // Ignore firebase auth if user intentionally clicked "Guest"
+            if (isGuest) return; // Skip if guest is active
             
             if (user) {
+                // Check if 5 days have passed since last login
+                const lastLogin = localStorage.getItem('auracard_last_login');
+                const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
+                
+                if (lastLogin && (Date.now() - parseInt(lastLogin) > fiveDaysMs)) {
+                    // 5 days passed! Force logout.
+                    auth.signOut();
+                    localStorage.removeItem('auracard_last_login');
+                    alert("Session expired (5 days of inactivity). Please log in again!");
+                    showScreen('login-screen');
+                    return;
+                }
+
+                // Update login time
+                localStorage.setItem('auracard_last_login', Date.now());
+                
                 currentUser = user; 
                 let displayName = user.displayName;
                 if (!displayName && user.email) {
@@ -657,6 +680,8 @@
                 if (ADMIN_EMAILS.includes(user.email)) { 
                     document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); 
                 }
+                
+                // Auto-skip to Dashboard
                 showScreen('dashboard-screen');
             } else { showScreen('login-screen'); }
         });
