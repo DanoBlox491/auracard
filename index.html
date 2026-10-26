@@ -13,13 +13,11 @@
     <meta name="robots" content="index, follow">
     <meta name="author" content="Dano">
 
-    <!-- Open Graph / Facebook / Discord -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://auracard.isroot.in/">
     <meta property="og:title" content="AuraCard | Custom Roblox & Minecraft Profile Card Tracker">
     <meta property="og:description" content="Track and showcase your gaming stats! AuraCard is the ultimate free profile card maker for Roblox, Minecraft, and YouTube.">
     
-    <!-- 🛠️ SCHEMA MARKUP (The Secret Weapon) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -40,8 +38,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 4.7
-        const CURRENT_VERSION = "4.7"; 
+        // 🚀 AUTO-CACHE BUSTER: Version 5.0
+        const CURRENT_VERSION = "5.0"; 
         if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
             localStorage.setItem("auracard_version", CURRENT_VERSION);
             window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
@@ -52,7 +50,6 @@
         :root { --bg: #0f0f13; --panel: #1e1e24; --text: #fff; --muted: #a0a0a5; --accent: #00e5ff; --gold: #ffd700; --yt-red: #ff0000; --green: #4CAF50; --orange: #ff9800; --purple: #9c27b0; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
-        /* 🎨 ROBLOX STYLE BACKGROUND */
         .bg-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop'); 
@@ -154,14 +151,12 @@
         #large-preview { max-width: 95vw; max-height: 75vh; border-radius: 12px; display: none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .viewer-actions { display: flex; gap: 15px; margin-top: 30px; }
         
-        /* 🎨 RESTORED BUTTON ANIMATIONS */
         .viewer-actions button { padding: 15px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: all 0.3s ease; }
         .viewer-actions button:hover { transform: translateY(-3px) scale(1.05); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         
         .close-viewer { position: absolute; top: 30px; right: 40px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; transition: 0.3s; }
         .close-viewer:hover { color: #ff5252; transform: rotate(90deg); }
         
-        /* 🎵 MUSIC BUTTON FIX */
         .music-toggle { position: absolute; top: 30px; left: 40px; background: #ff5252; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; z-index: 10; font-family: 'Montserrat', sans-serif; }
         .music-toggle:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); }
 
@@ -173,7 +168,6 @@
 </head>
 <body>
 
-    <!-- 🎨 GAMING BACKGROUND -->
     <div class="bg-container"></div>
 
     <audio id="funkPlayer" loop preload="auto"></audio>
@@ -192,24 +186,31 @@
         </div>
     </div>
 
-    <!-- 🔐 AUTH MODAL -->
+    <!-- 🔐 AUTH MODAL (LOGIN) -->
     <div class="modal-overlay" id="auth-modal">
         <div class="modal" style="text-align: center;">
             <h2 id="auth-modal-title">Log In</h2>
             
-            <div class="auth-input-group">
-                <input type="text" id="auth-email" class="auth-input" placeholder="Username or Email">
-                <input type="password" id="auth-password" class="auth-input" placeholder="Password">
+            <div class="auth-input-group" id="login-fields">
+                <input type="text" id="login-username" class="auth-input" placeholder="Username">
+                <input type="password" id="login-password" class="auth-input" placeholder="Password">
             </div>
-            <button class="auth-submit-btn" id="email-auth-btn" onclick="handleEmailAuth()">Log In</button>
+
+            <div class="auth-input-group" id="signup-fields" style="display: none;">
+                <input type="text" id="signup-username" class="auth-input" placeholder="Choose a Username">
+                <input type="email" id="signup-email" class="auth-input" placeholder="Email Address">
+                <input type="password" id="signup-password" class="auth-input" placeholder="Password">
+                <input type="password" id="signup-confirm" class="auth-input" placeholder="Confirm Password">
+            </div>
+
+            <button class="auth-submit-btn" id="email-auth-btn" onclick="handleAuth()">Log In</button>
             <p class="auth-toggle-link" id="auth-toggle-link" onclick="toggleAuthMode()">Don't have an account? Sign Up</p>
 
-            <div class="auth-divider">OR CONTINUE WITH</div>
-            
-            <button class="auth-btn btn-google" id="googleLoginBtn"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Continue with Google</button>
-            <button class="auth-btn btn-discord" id="discordLoginBtn">Continue with Discord</button>
-            <button class="auth-btn btn-github" id="githubLoginBtn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Continue with GitHub</button>
-            <button class="auth-btn btn-ms" id="microsoftLoginBtn">Continue with Microsoft / Xbox</button>
+            <div id="auth-providers-section">
+                <div class="auth-divider">OR CONTINUE WITH</div>
+                <button class="auth-btn btn-google" id="googleLoginBtn"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Continue with Google</button>
+                <button class="auth-btn btn-discord" id="discordLoginBtn">Continue with Discord</button>
+            </div>
             
             <div class="modal-actions" style="margin-top: 15px;">
                 <button onclick="closeAuthModal()" style="background: #333; color: white;">Cancel</button>
@@ -403,6 +404,7 @@
 
         let currentPlatform = ""; let currentUser = null; let validatedUsername = "";
         let isGuest = false;
+        let isSignUpMode = false;
         window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
         const funkPlayer = document.getElementById('funkPlayer');
         const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
@@ -412,45 +414,18 @@
         function updateMusicUI(isPlaying) { 
             const btn = document.getElementById('musicToggle'); 
             if (!btn) return; 
-            if (isPlaying) { 
-                btn.innerText = '🔊 Music On'; 
-                btn.style.background = 'var(--green)'; 
-            } else { 
-                btn.innerText = '🔇 Click to Play Music'; 
-                btn.style.background = '#ff5252'; 
-            } 
+            if (isPlaying) { btn.innerText = '🔊 Music On'; btn.style.background = 'var(--green)'; } 
+            else { btn.innerText = '🔇 Click to Play Music'; btn.style.background = '#ff5252'; } 
         }
-        
-        async function tryAutoplayMusic() { 
-            try { 
-                funkPlayer.volume = 0.5; 
-                await funkPlayer.play(); 
-                updateMusicUI(true); 
-            } catch (err) { 
-                console.log("Autoplay blocked:", err);
-                updateMusicUI(false); 
-            } 
-        }
-        
+        async function tryAutoplayMusic() { try { funkPlayer.volume = 0.5; await funkPlayer.play(); updateMusicUI(true); } catch (err) { updateMusicUI(false); } }
         function toggleMusic() { 
-            // 🔥 FIX: Ensure there is a source before trying to play
-            if (!funkPlayer.src || funkPlayer.src === "") {
-                funkPlayer.src = FUNK_LOW;
-            }
-            
+            if (!funkPlayer.src || funkPlayer.src === "") { funkPlayer.src = FUNK_LOW; }
             if (funkPlayer.paused) { 
                 funkPlayer.volume = 0.5; 
-                funkPlayer.play()
-                    .then(() => updateMusicUI(true))
-                    .catch(e => { 
-                        console.error("Music Play Error:", e); 
-                        updateMusicUI(false); 
-                        alert("Could not play music: " + e.message + "\nTry clicking again.");
-                    }); 
-            } else { 
-                funkPlayer.pause(); 
-                updateMusicUI(false); 
-            } 
+                funkPlayer.play().then(() => updateMusicUI(true)).catch(e => { 
+                    if (e.name !== 'AbortError') { updateMusicUI(false); }
+                }); 
+            } else { funkPlayer.pause(); updateMusicUI(false); } 
         }
 
         function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
@@ -466,10 +441,7 @@
         }
 
         function checkIfGuest() {
-            if (isGuest) {
-                alert("You are browsing as a Guest. Please Log In or Sign Up to generate your own AuraCards!");
-                return;
-            }
+            if (isGuest) { alert("You are browsing as a Guest. Please Log In or Sign Up to generate your own AuraCards!"); return; }
             document.getElementById('create-modal').classList.add('active');
             document.getElementById('validation-error').style.display = 'none';
             document.getElementById('input-username').value = "";
@@ -478,8 +450,6 @@
         }
 
         // 🔐 AUTH MODAL & LOGIC
-        let isSignUpMode = false;
-        
         function openAuthModal(mode) {
             document.getElementById('auth-modal').classList.add('active');
             isSignUpMode = (mode === 'signup');
@@ -488,8 +458,12 @@
         
         function closeAuthModal() { 
             document.getElementById('auth-modal').classList.remove('active'); 
-            document.getElementById('auth-email').value = '';
-            document.getElementById('auth-password').value = '';
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('signup-username').value = '';
+            document.getElementById('signup-email').value = '';
+            document.getElementById('signup-password').value = '';
+            document.getElementById('signup-confirm').value = '';
         }
 
         function toggleAuthMode() {
@@ -501,31 +475,66 @@
             document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Sign Up" : "Log In";
             document.getElementById('email-auth-btn').innerText = isSignUpMode ? "Create Account" : "Log In";
             document.getElementById('auth-toggle-link').innerText = isSignUpMode ? "Already have an account? Log In" : "Don't have an account? Sign Up";
+            
+            if (isSignUpMode) {
+                document.getElementById('login-fields').style.display = 'none';
+                document.getElementById('signup-fields').style.display = 'flex';
+                document.getElementById('auth-providers-section').style.display = 'none'; // Hide Auth on Signup
+            } else {
+                document.getElementById('login-fields').style.display = 'flex';
+                document.getElementById('signup-fields').style.display = 'none';
+                document.getElementById('auth-providers-section').style.display = 'block'; // Show Auth on Login
+            }
         }
 
-        async function handleEmailAuth() {
-            let email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
+        async function handleAuth() {
             const btn = document.getElementById('email-auth-btn');
-
-            if (!email || !password) return alert("Please fill in both fields!");
-
-            if (!email.includes('@')) {
-                email = email + '@auracard.user';
-            }
-
             btn.innerText = "Processing...";
             btn.disabled = true;
 
             try {
                 if (isSignUpMode) {
-                    await auth.createUserWithEmailAndPassword(email, password);
+                    const username = document.getElementById('signup-username').value.trim();
+                    const email = document.getElementById('signup-email').value.trim();
+                    const pass = document.getElementById('signup-password').value;
+                    const confirm = document.getElementById('signup-confirm').value;
+
+                    if (!username || !email || !pass) throw new Error("Please fill all fields.");
+                    if (pass !== confirm) throw new Error("Passwords do not match.");
+                    if (username.includes(' ')) throw new Error("Username cannot have spaces.");
+
+                    // 1. Check if Username is taken
+                    const userDoc = await db.collection('users').where('username', '==', username.toLowerCase()).get();
+                    if (!userDoc.empty) throw new Error("Username is already taken!");
+
+                    // 2. Create Auth Account
+                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                    
+                    // 3. Save User data to Firestore
+                    await db.collection('users').doc(cred.user.uid).set({
+                        username: username.toLowerCase(),
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    closeAuthModal();
                 } else {
-                    await auth.signInWithEmailAndPassword(email, password);
+                    const username = document.getElementById('login-username').value.trim();
+                    const pass = document.getElementById('login-password').value;
+
+                    if (!username || !pass) throw new Error("Please fill all fields.");
+
+                    // 1. Find user by username
+                    const userDoc = await db.collection('users').where('username', '==', username.toLowerCase()).get();
+                    if (userDoc.empty) throw new Error("User not found.");
+
+                    // 2. Get Email
+                    const email = userDoc.docs[0].data().email;
+
+                    // 3. Sign In
+                    await auth.signInWithEmailAndPassword(email, pass);
+                    closeAuthModal();
                 }
-                isGuest = false;
-                localStorage.setItem('auracard_last_login', Date.now()); // Save login time
-                closeAuthModal();
             } catch (error) {
                 alert("Error: " + error.message);
                 btn.innerText = isSignUpMode ? "Create Account" : "Log In";
@@ -533,68 +542,20 @@
             }
         }
 
-        function getPlatformIconSVG(p) { if(p==='minecraft')return `<svg class="lb-icon" viewBox="0 0 100 100"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`; if(p==='bedrock')return `<svg class="lb-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/></svg>`; if(p==='roblox')return `<svg class="lb-icon" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`; return `<svg class="lb-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`; }
-        
-        function selectPlatform(platform) { currentPlatform = platform; const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' }; document.getElementById('platform-title').innerText = titleMap[platform]; document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`; if (platform === 'roblox') { document.getElementById('roblox-inputs').style.display = 'block'; } else { document.getElementById('roblox-inputs').style.display = 'none'; } showScreen('platform-screen'); loadLeaderboard(platform); }
-        
         async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; isGuest = false; localStorage.setItem('auracard_last_login', Date.now()); closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
         
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
         document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
         document.getElementById('microsoftLoginBtn').addEventListener('click', () => loginWithProvider('microsoft'));
         document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
+        
         document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; isGuest = false; localStorage.removeItem('auracard_last_login'); showScreen('login-screen'); });
 
         function showSupportSoon() { alert("☕ The donation page is being set up and will be live tomorrow! Thank you for wanting to support AuraCard! 👑"); }
 
-        function openFeedbackModal() { document.getElementById('feedback-modal').classList.add('active'); if(currentUser && currentUser.email && !isGuest) { document.getElementById('feedback-email').value = currentUser.email; } }
-        function closeFeedbackModal() { document.getElementById('feedback-modal').classList.remove('active'); document.getElementById('feedback-text').value = ''; }
-
-        async function submitFeedback() {
-            const email = document.getElementById('feedback-email').value.trim();
-            const text = document.getElementById('feedback-text').value.trim();
-            if (!text || !email) return alert("Please fill in both email and message!");
-            
-            const btn = document.getElementById('submit-feedback-btn'); btn.innerText = "Sending..."; btn.disabled = true;
-            try {
-                await db.collection('feedback').add({ user: isGuest ? "Guest" : (currentUser.displayName || currentUser.email), email: email, uid: currentUser ? currentUser.uid : "guest", message: text, timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: false });
-                btn.innerText = "✅ Sent!"; setTimeout(() => { closeFeedbackModal(); btn.innerText = "Send"; btn.disabled = false; }, 2000);
-            } catch(e) { alert("Failed to send: " + e.message); btn.innerText = "Send"; btn.disabled = false; }
-        }
-
-        function openAdminModal() {
-            if (isGuest || !ADMIN_EMAILS.includes(currentUser.email)) return alert("Only Dano can access this!");
-            document.getElementById('admin-modal').classList.add('active');
-            const list = document.getElementById('admin-feedback-list');
-            list.innerHTML = '<p style="color:var(--muted);">Loading feedback...</p>';
-
-            db.collection('feedback').orderBy('timestamp', 'desc').get().then((snap) => {
-                list.innerHTML = "";
-                if(snap.empty) { list.innerHTML = '<p style="color:var(--muted);">No feedback yet.</p>'; return; }
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    list.innerHTML += `
-                        <div style="background: #15151a; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333;">
-                            <p style="margin: 0 0 5px 0; font-size: 12px; color: var(--accent);"><b>From:</b> ${d.email}</p>
-                            <p style="margin: 0 0 10px 0; font-size: 14px;">${d.message}</p>
-                            <input type="text" id="reply-${doc.id}" placeholder="Type reply..." style="width: 100%; padding: 8px; background: #0f0f13; border: 1px solid #333; color: white; border-radius: 5px; margin-bottom: 5px;">
-                            <button onclick="sendReply('${doc.id}', '${d.email}')" style="background: var(--green); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Send Reply</button>
-                        </div>
-                    `;
-                });
-            });
-        }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.remove('active'); }
-
-        async function sendReply(docId, toEmail) {
-            const replyText = document.getElementById(`reply-${docId}`).value;
-            if (!replyText) return alert("Type a reply first!");
-            try {
-                const res = await fetch('https://auracard-backend-kzgy.onrender.com/api/send_reply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to_email: toEmail, reply_message: replyText }) });
-                const data = await res.json();
-                if(data.success) { alert("✅ Email sent successfully!"); document.getElementById(`reply-${docId}`).value = ""; } else { alert("Error: " + data.error); }
-            } catch(e) { alert("Error: " + e.message); }
-        }
+        function getPlatformIconSVG(p) { if(p==='minecraft')return `<svg class="lb-icon" viewBox="0 0 100 100"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`; if(p==='bedrock')return `<svg class="lb-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/></svg>`; if(p==='roblox')return `<svg class="lb-icon" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`; return `<svg class="lb-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`; }
+        
+        function selectPlatform(platform) { currentPlatform = platform; const titleMap = { 'minecraft': 'Minecraft Java', 'bedrock': 'Minecraft Bedrock', 'roblox': 'Roblox', 'youtube': 'YouTube' }; document.getElementById('platform-title').innerText = titleMap[platform]; document.getElementById('platform-leaderboard-title').innerText = `Top ${titleMap[platform]} Aura Farmers`; if (platform === 'roblox') { document.getElementById('roblox-inputs').style.display = 'block'; } else { document.getElementById('roblox-inputs').style.display = 'none'; } showScreen('platform-screen'); loadLeaderboard(platform); }
 
         function closeModal() { document.getElementById('create-modal').classList.remove('active'); }
         function closeViewer() { funkPlayer.pause(); updateMusicUI(false); document.getElementById('card-viewer').classList.remove('active'); document.getElementById('large-preview').style.display = 'none'; document.getElementById('upload-success').style.display = 'none'; document.getElementById('uploadBtn').style.display = 'block'; document.getElementById('shareBtn').style.display = 'none'; }
@@ -624,17 +585,10 @@
                 if (currentPlatform === 'roblox') { stat1 = d.games_played || "0"; stat2 = d.games_won || "0"; stat3 = d.aura_streak || "0x"; stat4 = d.most_played_game || "Rivals"; stat5 = d.friends !== undefined ? d.friends : "0"; label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS"; }
                 else if (currentPlatform === 'youtube') { stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level); stat2 = d.subs.toLocaleString(); stat3 = d.views.toLocaleString(); stat4 = "YouTube"; stat5 = "Creator"; label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS"; }
                 else { stat1 = d.blocks_mined || "0"; stat2 = d.mobs_killed || "0"; stat3 = d.diamonds_found || "0"; stat4 = currentPlatform.toUpperCase(); stat5 = d.playtime || "0 Hours"; label1 = "BLOCKS MINED"; label2 = "MOBS KILLED"; label3 = "DIAMONDS"; label4 = "PLATFORM"; label5 = "PLAYTIME"; }
-                
-                // Set Music Source
                 if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } else { funkPlayer.src = FUNK_LOW; }
-            } else {
-                // Fallback if backend fails
-                funkPlayer.src = FUNK_LOW;
-            }
+            } else { funkPlayer.src = FUNK_LOW; }
             
-            funkPlayer.load(); 
-            tryAutoplayMusic();
-            
+            funkPlayer.load(); tryAutoplayMusic();
             const canvas = document.getElementById('card-canvas'); canvas.width = 900; canvas.height = 600; const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#0f0f13'; ctx.fillRect(0, 0, 900, 600); ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, 880, 580);
             ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 50px "Montserrat", sans-serif'; ctx.fillText("AURACARD", 50, 80);
@@ -700,13 +654,11 @@
             const largePreview = document.getElementById('large-preview'); largePreview.src = data.image; largePreview.style.display = 'block';
             document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'none'; document.getElementById('shareBtn').style.display = 'flex'; document.getElementById('upload-success').style.display = 'none';
             
-            // 🔥 FIX: Set music source when viewing a leaderboard card
             if (data.wins >= 100) { funkPlayer.src = FUNK_HIGH; } 
             else if (data.wins >= 50) { funkPlayer.src = FUNK_MID; } 
             else { funkPlayer.src = FUNK_LOW; }
             
-            funkPlayer.load();
-            tryAutoplayMusic();
+            funkPlayer.load(); tryAutoplayMusic();
         }
 
         auth.onAuthStateChanged((user) => {
@@ -721,7 +673,15 @@
                 currentUser = user; 
                 let displayName = user.displayName;
                 if (!displayName && user.email) { displayName = user.email.split('@')[0]; }
-                document.getElementById('user-name').innerText = displayName || "Gamer"; 
+                
+                // Fetch username from Firestore
+                db.collection('users').doc(user.uid).get().then(doc => {
+                    if (doc.exists && doc.data().username) {
+                        displayName = doc.data().username;
+                    }
+                    document.getElementById('user-name').innerText = displayName || "Gamer"; 
+                });
+
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
                 if (ADMIN_EMAILS.includes(user.email)) { document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); }
                 showScreen('dashboard-screen');
