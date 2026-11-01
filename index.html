@@ -186,8 +186,8 @@
 
     <audio id="funkPlayer" loop preload="auto"></audio>
 
-    <!-- SCREEN 1: LANDING PAGE -->
-    <div id="login-screen" class="screen">
+    <!-- SCREEN 1: LANDING PAGE (DEFAULT ACTIVE) -->
+    <div id="login-screen" class="screen active">
         <div class="landing-container">
             <h1 class="landing-title">AuraCard</h1>
             <p class="landing-subtitle">Show your aura to the internet!</p>
@@ -415,9 +415,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 🔒 Explicitly enforce local persistent storage so sessions survive tab close!
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
-
         const ADMIN_EMAILS = ["vaishinstruz@gmail.com"];
         const DEV_USERNAMES = ["dano", "danoblox491", "dano-dev"];
 
@@ -540,7 +537,6 @@
                     const cred = await auth.createUserWithEmailAndPassword(email, pass);
                     currentUser = cred.user;
                     isGuest = false;
-                    localStorage.setItem('auracard_logged_in', 'true');
                     localStorage.setItem('auracard_last_login', Date.now());
                     
                     await db.collection('users').doc(cred.user.uid).set({
@@ -567,7 +563,6 @@
                     const cred = await auth.signInWithEmailAndPassword(email, pass);
                     currentUser = cred.user;
                     isGuest = false;
-                    localStorage.setItem('auracard_logged_in', 'true');
                     localStorage.setItem('auracard_last_login', Date.now());
                     closeAuthModal();
                     showScreen('dashboard-screen');
@@ -591,7 +586,6 @@
                 const r = await auth.signInWithPopup(provider); 
                 currentUser = r.user; 
                 isGuest = false; 
-                localStorage.setItem('auracard_logged_in', 'true');
                 localStorage.setItem('auracard_last_login', Date.now()); 
                 
                 const uRef = db.collection('users').doc(r.user.uid);
@@ -626,7 +620,6 @@
             }
             currentUser = null; 
             isGuest = false; 
-            localStorage.removeItem('auracard_logged_in');
             localStorage.removeItem('auracard_last_login'); 
             showScreen('login-screen'); 
         }
@@ -770,10 +763,9 @@
             const largePreview = document.getElementById('large-preview'); 
             let compressedImage = '';
             try {
-                // Highly optimized: 0.65 quality is crystal clear but well under Firestore's 1MB limit
                 compressedImage = canvas.toDataURL('image/jpeg', 0.65);
             } catch(e) {
-                compressedImage = canvas.toDataURL('image/jpeg', 0.5);
+                compressedImage = canvas.toDataURL();
             }
             largePreview.src = compressedImage; 
             largePreview.style.display = 'block';
@@ -798,9 +790,12 @@
             link.click(); 
         });
 
-        // 🚀 BULLETPROOF CARD UPLOADER
+        // 🚀 BULLETPROOF CARD UPLOADER (Checks login state & handles errors)
         async function uploadCurrentCard() { 
-            if (isGuest || !currentUser) {
+            if (isGuest) {
+                return alert("Guests cannot upload cards! Please log in.");
+            }
+            if (!currentUser) {
                 return alert("You must be logged in to upload cards to the leaderboard! Please log in.");
             }
             if (!window.generatedCardData) {
@@ -900,19 +895,11 @@
             funkPlayer.load(); tryAutoplayMusic();
         }
 
-        // 🧠 PERSISTENT REVISIT SESSION HANDLER
-        // If user already logged in previously, don't flash login screen!
-        if (localStorage.getItem('auracard_logged_in') === 'true') {
-            showScreen('dashboard-screen');
-        } else {
-            showScreen('login-screen');
-        }
-
+        // 🧠 SAFE ON-AUTH-STATE-CHANGED LISTENER
         auth.onAuthStateChanged((user) => {
             if (isGuest) return;
             if (user) {
                 currentUser = user; 
-                localStorage.setItem('auracard_logged_in', 'true');
                 localStorage.setItem('auracard_last_login', Date.now());
                 
                 let displayName = user.displayName;
@@ -923,6 +910,8 @@
                         displayName = doc.data().username;
                     }
                     document.getElementById('user-name').innerText = displayName || "Gamer"; 
+                }).catch(() => {
+                    document.getElementById('user-name').innerText = displayName || "Gamer"; 
                 });
 
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
@@ -931,10 +920,8 @@
                 }
                 showScreen('dashboard-screen');
             } else { 
-                if (localStorage.getItem('auracard_logged_in') !== 'true') {
-                    currentUser = null;
-                    showScreen('login-screen'); 
-                }
+                currentUser = null;
+                showScreen('login-screen'); 
             }
         });
     </script>
