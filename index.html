@@ -22,7 +22,7 @@
     <meta property="og:title" content="AuraCard | Roblox Rivals & Minecraft Gaming Profile Card Maker">
     <meta property="og:description" content="Track your Roblox Rivals wins and Minecraft stats! Generate a custom gaming profile card and climb the leaderboard.">
     
-    <!-- 🛠️ SCHEMA MARKUP (Hyper-Targeted to prevent Car confusion) -->
+    <!-- 🛠️ SCHEMA MARKUP -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -51,7 +51,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // 🚀 AUTO-CACHE BUSTER: Version 5.2
         const CURRENT_VERSION = "5.2"; 
         try {
             if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
@@ -188,7 +187,7 @@
     <audio id="funkPlayer" loop preload="auto"></audio>
 
     <!-- SCREEN 1: LANDING PAGE -->
-    <div id="login-screen" class="screen active">
+    <div id="login-screen" class="screen">
         <div class="landing-container">
             <h1 class="landing-title">AuraCard</h1>
             <p class="landing-subtitle">Show your aura to the internet!</p>
@@ -244,7 +243,7 @@
                 <button class="showcase-btn" onclick="window.open('https://www.youtube.com/watch?v=z-Ghw6lu2is', '_blank')">🎥 Showcase</button>
                 <img id="user-avatar" src="https://via.placeholder.com/35">
                 <span id="user-name" style="font-weight: bold; font-size: 14px;">User</span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
+                <button class="logout-btn" onclick="logoutUser()">Logout</button>
             </div>
         </div>
         <div class="dashboard">
@@ -402,14 +401,13 @@
         <div class="viewer-actions" id="viewer-actions">
             <button id="downloadBtn" style="background: var(--green); color: white;">📥 Download PNG</button>
             <button id="shareBtn" style="background: var(--purple); color: white; display: none;">📤 Share Card</button>
-            <button id="uploadBtn" style="background: var(--accent); color: #000;">🚀 Upload to AuraCard</button>
+            <button id="uploadBtn" style="background: var(--accent); color: #000;" onclick="uploadCurrentCard()">🚀 Upload to AuraCard</button>
         </div>
         <p id="upload-success" style="color: var(--green); display: none; font-weight: bold;">✅ Successfully uploaded!</p>
         <canvas id="card-canvas" style="display: none;"></canvas>
     </div>
 
     <script>
-        // 🚀 BACKEND URL (Change this to your live Vercel URL)
         const BACKEND_URL = "https://auracard-backend.vercel.app";
 
         const firebaseConfig = { apiKey: "AIzaSyCYhHn7VEETiFPkMh9OtYO825-ejUQBNUg", authDomain: "auracard-7b97f.firebaseapp.com", projectId: "auracard-7b97f", storageBucket: "auracard-7b97f.firebasestorage.app", messagingSenderId: "266276728636", appId: "1:266276728636:web:2c36f2e588d6d8dcab3839", measurementId: "G-MZ0242QRC7" };
@@ -417,13 +415,21 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // 🔒 Explicitly enforce local persistent storage so sessions survive tab close!
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
+
         const ADMIN_EMAILS = ["vaishinstruz@gmail.com"];
         const DEV_USERNAMES = ["dano", "danoblox491", "dano-dev"];
 
-        let currentPlatform = ""; let currentUser = null; let validatedUsername = "";
+        let currentPlatform = ""; 
+        let currentUser = null; 
+        let validatedUsername = "";
         let isGuest = false;
         let isSignUpMode = false;
-        window.realData = null; window.generatedCardData = null; window.leaderboardCache = {};
+        window.realData = null; 
+        window.generatedCardData = null; 
+        window.leaderboardCache = {};
+        
         const funkPlayer = document.getElementById('funkPlayer');
         const FUNK_LOW = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
         const FUNK_MID = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; 
@@ -446,7 +452,11 @@
             } else { funkPlayer.pause(); updateMusicUI(false); } 
         }
 
-        function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
+        function showScreen(screenId) { 
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            const target = document.getElementById(screenId);
+            if (target) target.classList.add('active'); 
+        }
         function goToDashboard() { showScreen('dashboard-screen'); }
 
         // 👤 GUEST LOGIC
@@ -459,7 +469,10 @@
         }
 
         function checkIfGuest() {
-            if (isGuest) { alert("You are browsing as a Guest. Please Log In or Sign Up to generate your own AuraCards!"); return; }
+            if (isGuest || !currentUser) { 
+                alert("You are browsing as a Guest. Please Log In or Sign Up to generate your own AuraCards!"); 
+                return; 
+            }
             document.getElementById('create-modal').classList.add('active');
             document.getElementById('validation-error').style.display = 'none';
             document.getElementById('input-username').value = "";
@@ -525,6 +538,10 @@
                     if (!userDoc.empty) throw new Error("Username is already taken!");
 
                     const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                    currentUser = cred.user;
+                    isGuest = false;
+                    localStorage.setItem('auracard_logged_in', 'true');
+                    localStorage.setItem('auracard_last_login', Date.now());
                     
                     await db.collection('users').doc(cred.user.uid).set({
                         username: username.toLowerCase(),
@@ -533,21 +550,31 @@
                     });
 
                     closeAuthModal();
+                    showScreen('dashboard-screen');
                 } else {
                     const username = document.getElementById('login-username').value.trim();
                     const pass = document.getElementById('login-password').value;
 
                     if (!username || !pass) throw new Error("Please fill all fields.");
 
-                    const userDoc = await db.collection('users').where('username', '==', username.toLowerCase()).get();
-                    if (userDoc.empty) throw new Error("User not found.");
+                    let email = username;
+                    if (!username.includes('@')) {
+                        const userDoc = await db.collection('users').where('username', '==', username.toLowerCase()).limit(1).get();
+                        if (userDoc.empty) throw new Error("User not found.");
+                        email = userDoc.docs[0].data().email;
+                    }
 
-                    const email = userDoc.docs[0].data().email;
-                    await auth.signInWithEmailAndPassword(email, pass);
+                    const cred = await auth.signInWithEmailAndPassword(email, pass);
+                    currentUser = cred.user;
+                    isGuest = false;
+                    localStorage.setItem('auracard_logged_in', 'true');
+                    localStorage.setItem('auracard_last_login', Date.now());
                     closeAuthModal();
+                    showScreen('dashboard-screen');
                 }
             } catch (error) {
                 alert("Error: " + error.message);
+            } finally {
                 btn.innerText = isSignUpMode ? "Create Account" : "Log In";
                 btn.disabled = false;
             }
@@ -564,9 +591,9 @@
                 const r = await auth.signInWithPopup(provider); 
                 currentUser = r.user; 
                 isGuest = false; 
+                localStorage.setItem('auracard_logged_in', 'true');
                 localStorage.setItem('auracard_last_login', Date.now()); 
                 
-                // Ensure users document exists in Firestore
                 const uRef = db.collection('users').doc(r.user.uid);
                 const uSnap = await uRef.get();
                 if (!uSnap.exists) {
@@ -590,14 +617,24 @@
         document.getElementById('microsoftLoginBtn').addEventListener('click', () => loginWithProvider('microsoft'));
         document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
         
-        document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; isGuest = false; localStorage.removeItem('auracard_last_login'); showScreen('login-screen'); });
+        // 🚪 Rock-solid Logout function
+        async function logoutUser() { 
+            try {
+                await auth.signOut();
+            } catch(e) {
+                console.warn(e);
+            }
+            currentUser = null; 
+            isGuest = false; 
+            localStorage.removeItem('auracard_logged_in');
+            localStorage.removeItem('auracard_last_login'); 
+            showScreen('login-screen'); 
+        }
 
-        // ☕ Kulhad Support Page Launch
         function showSupportSoon() { 
             window.open("https://kulhad.co/dano-dev", "_blank");
         }
 
-        // 💬 FEEDBACK FUNCTIONS
         function openFeedbackModal() {
             document.getElementById('feedback-modal').classList.add('active');
             if (currentUser && currentUser.email && !currentUser.isGuest) {
@@ -629,7 +666,6 @@
             }
         }
 
-        // 👑 ADMIN FUNCTIONS
         async function openAdminModal() {
             if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) {
                 return alert("Access restricted to Admins only.");
@@ -682,7 +718,7 @@
                 const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
                 const data = await res.json();
                 if (data.success) { isValid = true; window.realData = data; } else { err.innerText = data.error || "Validation failed"; err.style.display = 'block'; }
-            } catch (e) { err.innerText = "Cannot connect to Backend. Ensure Vercel server is running."; err.style.display = 'block'; }
+            } catch (e) { err.innerText = "Cannot connect to Backend. Ensure server is running."; err.style.display = 'block'; }
             btn.innerText = "Validate"; if (isValid) { validatedUsername = username; closeModal(); await generateCard(); }
         }
 
@@ -734,20 +770,69 @@
             const largePreview = document.getElementById('large-preview'); 
             let compressedImage = '';
             try {
-                compressedImage = canvas.toDataURL('image/jpeg', 0.8);
+                // Highly optimized: 0.65 quality is crystal clear but well under Firestore's 1MB limit
+                compressedImage = canvas.toDataURL('image/jpeg', 0.65);
             } catch(e) {
-                compressedImage = canvas.toDataURL();
+                compressedImage = canvas.toDataURL('image/jpeg', 0.5);
             }
-            largePreview.src = compressedImage; largePreview.style.display = 'block';
-            document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'block'; document.getElementById('shareBtn').style.display = 'none';
-            window.generatedCardData = { image: compressedImage, platform: currentPlatform, username: validatedUsername, level: parseInt(String(stat1).replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0, bio: bio };
+            largePreview.src = compressedImage; 
+            largePreview.style.display = 'block';
+            document.getElementById('card-viewer').classList.add('active'); 
+            document.getElementById('uploadBtn').style.display = 'block'; 
+            document.getElementById('shareBtn').style.display = 'none';
+            window.generatedCardData = { 
+                image: compressedImage, 
+                platform: currentPlatform, 
+                username: validatedUsername, 
+                level: parseInt(String(stat1).replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0, 
+                bio: bio 
+            };
         }
         function loadImage(url) { return new Promise((resolve) => { const img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = url; }); }
 
-        document.getElementById('downloadBtn').addEventListener('click', () => { if (!window.generatedCardData) return; const link = document.createElement('a'); link.download = `${window.generatedCardData.username}_AuraCard.jpg`; link.href = window.generatedCardData.image; link.click(); });
-        document.getElementById('uploadBtn').addEventListener('click', async () => { 
-            if (isGuest) return alert("Guests cannot upload cards! Please log in.");
-            if (!window.generatedCardData || !db || !currentUser) return; const btn = document.getElementById('uploadBtn'); btn.innerText = "Uploading..."; btn.disabled = true; try { const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`; await db.collection('auracards').doc(uniqueDocId).set({ user: currentUser.uid, platform: window.generatedCardData.platform, username: window.generatedCardData.username, wins: window.generatedCardData.level, bio: window.generatedCardData.bio, image: window.generatedCardData.image, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); document.getElementById('upload-success').style.display = 'block'; btn.innerText = "✅ Uploaded!"; document.getElementById('shareBtn').style.display = 'flex'; setTimeout(() => { closeViewer(); loadLeaderboard(currentPlatform); }, 2500); } catch(e) { alert("Upload failed: " + e.message); btn.innerText = "🚀 Upload"; btn.disabled = false; } });
+        document.getElementById('downloadBtn').addEventListener('click', () => { 
+            if (!window.generatedCardData) return; 
+            const link = document.createElement('a'); 
+            link.download = `${window.generatedCardData.username}_AuraCard.jpg`; 
+            link.href = window.generatedCardData.image; 
+            link.click(); 
+        });
+
+        // 🚀 BULLETPROOF CARD UPLOADER
+        async function uploadCurrentCard() { 
+            if (isGuest || !currentUser) {
+                return alert("You must be logged in to upload cards to the leaderboard! Please log in.");
+            }
+            if (!window.generatedCardData) {
+                return alert("No card generated! Please generate your card first.");
+            }
+            const btn = document.getElementById('uploadBtn'); 
+            btn.innerText = "Uploading..."; 
+            btn.disabled = true; 
+            try { 
+                const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`; 
+                await db.collection('auracards').doc(uniqueDocId).set({ 
+                    user: currentUser.uid, 
+                    platform: window.generatedCardData.platform, 
+                    username: window.generatedCardData.username, 
+                    wins: window.generatedCardData.level, 
+                    bio: window.generatedCardData.bio, 
+                    image: window.generatedCardData.image, 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+                }); 
+                document.getElementById('upload-success').style.display = 'block'; 
+                btn.innerText = "✅ Uploaded!"; 
+                document.getElementById('shareBtn').style.display = 'flex'; 
+                setTimeout(() => { 
+                    closeViewer(); 
+                    loadLeaderboard(currentPlatform); 
+                }, 1500); 
+            } catch(e) { 
+                alert("Upload failed: " + e.message); 
+                btn.innerText = "🚀 Upload to AuraCard"; 
+                btn.disabled = false; 
+            } 
+        }
         
         document.getElementById('shareBtn').addEventListener('click', async () => { if (!window.generatedCardData) return; const shareData = { title: 'AuraCard', text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`, url: 'https://auracard.isroot.in' }; try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`); alert("Link copied!"); } } catch (err) {} });
 
@@ -762,7 +847,6 @@
             } catch (e) { alert("Error searching: " + e.message); }
         }
 
-        // Leaderboard with fallback in-memory sorting
         function loadLeaderboard(platform) {
             const list = document.getElementById('leaderboard-content'); list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`; if (!db) return;
             
@@ -789,8 +873,7 @@
                     renderDocs(docs);
                 })
                 .catch((err) => { 
-                    console.warn("Index warning, falling back to client sort:", err.message);
-                    // Safe fallback without composite index requirement
+                    console.warn("Falling back to client sorting mode:", err.message);
                     db.collection('auracards').where('platform', '==', platform).get()
                         .then((fallbackSnap) => {
                             const docs = fallbackSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -817,16 +900,21 @@
             funkPlayer.load(); tryAutoplayMusic();
         }
 
+        // 🧠 PERSISTENT REVISIT SESSION HANDLER
+        // If user already logged in previously, don't flash login screen!
+        if (localStorage.getItem('auracard_logged_in') === 'true') {
+            showScreen('dashboard-screen');
+        } else {
+            showScreen('login-screen');
+        }
+
         auth.onAuthStateChanged((user) => {
             if (isGuest) return;
             if (user) {
-                const lastLogin = localStorage.getItem('auracard_last_login');
-                const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
-                if (lastLogin && (Date.now() - parseInt(lastLogin) > fiveDaysMs)) {
-                    auth.signOut(); localStorage.removeItem('auracard_last_login'); alert("Session expired (5 days of inactivity). Please log in again!"); showScreen('login-screen'); return;
-                }
-                localStorage.setItem('auracard_last_login', Date.now());
                 currentUser = user; 
+                localStorage.setItem('auracard_logged_in', 'true');
+                localStorage.setItem('auracard_last_login', Date.now());
+                
                 let displayName = user.displayName;
                 if (!displayName && user.email) { displayName = user.email.split('@')[0]; }
                 
@@ -838,9 +926,16 @@
                 });
 
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/35";
-                if (ADMIN_EMAILS.includes(user.email)) { document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); }
+                if (ADMIN_EMAILS.includes(user.email)) { 
+                    document.querySelectorAll('.admin-btn').forEach(btn => btn.style.display = 'inline-block'); 
+                }
                 showScreen('dashboard-screen');
-            } else { showScreen('login-screen'); }
+            } else { 
+                if (localStorage.getItem('auracard_logged_in') !== 'true') {
+                    currentUser = null;
+                    showScreen('login-screen'); 
+                }
+            }
         });
     </script>
 </body>
