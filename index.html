@@ -112,8 +112,6 @@
 
         .auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
         .btn-google { background: white; color: #333; }
-        .btn-github { background: #24292e; color: white; border: 1px solid #444; }
-        .btn-ms { background: #0078d4; color: white; }
         .btn-discord { background: #5865F2; color: white; }
 
         .dashboard { width: 100%; max-width: 800px; }
@@ -186,7 +184,7 @@
 
     <audio id="funkPlayer" loop preload="auto"></audio>
 
-    <!-- SCREEN 1: LANDING PAGE (DEFAULT ACTIVE) -->
+    <!-- SCREEN 1: LANDING PAGE -->
     <div id="login-screen" class="screen active">
         <div class="landing-container">
             <h1 class="landing-title">AuraCard</h1>
@@ -578,10 +576,8 @@
         async function loginWithProvider(p) { 
             try { 
                 let provider; 
-                if(p==='google') provider = new firebase.auth.GoogleAuthProvider(); 
-                else if(p==='github') provider = new firebase.auth.GithubAuthProvider(); 
-                else if(p==='microsoft'){ provider = new firebase.auth.OAuthProvider('microsoft.com'); provider.setCustomParameters({prompt:'select_account'}); } 
-                else if(p==='discord') provider = new firebase.auth.OAuthProvider('discord.com'); 
+                if (p === 'google') provider = new firebase.auth.GoogleAuthProvider(); 
+                else if (p === 'discord') provider = new firebase.auth.OAuthProvider('discord.com'); 
                 
                 const r = await auth.signInWithPopup(provider); 
                 currentUser = r.user; 
@@ -606,12 +602,32 @@
             } 
         }
         
-        document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
-        document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
-        document.getElementById('microsoftLoginBtn').addEventListener('click', () => loginWithProvider('microsoft'));
-        document.getElementById('discordLoginBtn').addEventListener('click', () => loginWithProvider('discord'));
+        // 🛡️ Bulletproof Event Listeners (Checks elements before calling to prevent null crashes)
+        const gBtn = document.getElementById('googleLoginBtn');
+        if (gBtn) gBtn.onclick = () => loginWithProvider('google');
+
+        const dBtn = document.getElementById('discordLoginBtn');
+        if (dBtn) dBtn.onclick = () => loginWithProvider('discord');
+
+        const dlBtn = document.getElementById('downloadBtn');
+        if (dlBtn) dlBtn.onclick = () => { 
+            if (!window.generatedCardData) return; 
+            const link = document.createElement('a'); 
+            link.download = `${window.generatedCardData.username}_AuraCard.jpg`; 
+            link.href = window.generatedCardData.image; 
+            link.click(); 
+        };
+
+        const shBtn = document.getElementById('shareBtn');
+        if (shBtn) shBtn.onclick = async () => { 
+            if (!window.generatedCardData) return; 
+            const shareData = { title: 'AuraCard', text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`, url: 'https://auracard.isroot.in' }; 
+            try { 
+                if (navigator.share) { await navigator.share(shareData); } 
+                else { await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`); alert("Link copied!"); } 
+            } catch (err) {} 
+        };
         
-        // 🚪 Rock-solid Logout function
         async function logoutUser() { 
             try {
                 await auth.signOut();
@@ -782,15 +798,7 @@
         }
         function loadImage(url) { return new Promise((resolve) => { const img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = url; }); }
 
-        document.getElementById('downloadBtn').addEventListener('click', () => { 
-            if (!window.generatedCardData) return; 
-            const link = document.createElement('a'); 
-            link.download = `${window.generatedCardData.username}_AuraCard.jpg`; 
-            link.href = window.generatedCardData.image; 
-            link.click(); 
-        });
-
-        // 🚀 BULLETPROOF CARD UPLOADER (Checks login state & handles errors)
+        // 🚀 BULLETPROOF CARD UPLOADER
         async function uploadCurrentCard() { 
             if (isGuest) {
                 return alert("Guests cannot upload cards! Please log in.");
@@ -828,8 +836,6 @@
                 btn.disabled = false; 
             } 
         }
-        
-        document.getElementById('shareBtn').addEventListener('click', async () => { if (!window.generatedCardData) return; const shareData = { title: 'AuraCard', text: `Check out ${window.generatedCardData.username}'s AuraCard! Aura Level: ${window.generatedCardData.level}`, url: 'https://auracard.isroot.in' }; try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(`https://auracard.isroot.in - Check out ${window.generatedCardData.username}'s AuraCard!`); alert("Link copied!"); } } catch (err) {} });
 
         async function searchUser() {
             const searchTerm = document.getElementById('search-input').value.trim().toLowerCase();
@@ -895,7 +901,7 @@
             funkPlayer.load(); tryAutoplayMusic();
         }
 
-        // 🧠 SAFE ON-AUTH-STATE-CHANGED LISTENER
+        // 🧠 SAFE AUTH STATE LISTENER (Restores session smoothly without crashing)
         auth.onAuthStateChanged((user) => {
             if (isGuest) return;
             if (user) {
