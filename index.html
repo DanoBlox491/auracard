@@ -53,10 +53,12 @@
     <script>
         // 🚀 AUTO-CACHE BUSTER: Version 5.2
         const CURRENT_VERSION = "5.2"; 
-        if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
-            localStorage.setItem("auracard_version", CURRENT_VERSION);
-            window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
-        }
+        try {
+            if (localStorage.getItem("auracard_version") !== CURRENT_VERSION) {
+                localStorage.setItem("auracard_version", CURRENT_VERSION);
+                window.location.href = window.location.pathname + '?v=' + CURRENT_VERSION;
+            }
+        } catch(e) {}
     </script>
 
     <style>
@@ -407,6 +409,9 @@
     </div>
 
     <script>
+        // 🚀 BACKEND URL (Change this to your live Vercel URL)
+        const BACKEND_URL = "https://auracard-backend.vercel.app";
+
         const firebaseConfig = { apiKey: "AIzaSyCYhHn7VEETiFPkMh9OtYO825-ejUQBNUg", authDomain: "auracard-7b97f.firebaseapp.com", projectId: "auracard-7b97f", storageBucket: "auracard-7b97f.firebasestorage.app", messagingSenderId: "266276728636", appId: "1:266276728636:web:2c36f2e588d6d8dcab3839", measurementId: "G-MZ0242QRC7" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -548,7 +553,37 @@
             }
         }
 
-        async function loginWithProvider(p) { try { let provider; if(p==='google')provider=new firebase.auth.GoogleAuthProvider(); else if(p==='github')provider=new firebase.auth.GithubAuthProvider(); else if(p==='microsoft'){provider=new firebase.auth.OAuthProvider('microsoft.com');provider.setCustomParameters({prompt:'select_account'});} else if(p==='discord')provider=new firebase.auth.OAuthProvider('discord.com'); const r=await auth.signInWithPopup(provider); currentUser=r.user; isGuest = false; localStorage.setItem('auracard_last_login', Date.now()); closeAuthModal(); showScreen('dashboard-screen'); } catch(e){alert(`Login failed: `+e.message);} }
+        async function loginWithProvider(p) { 
+            try { 
+                let provider; 
+                if(p==='google') provider = new firebase.auth.GoogleAuthProvider(); 
+                else if(p==='github') provider = new firebase.auth.GithubAuthProvider(); 
+                else if(p==='microsoft'){ provider = new firebase.auth.OAuthProvider('microsoft.com'); provider.setCustomParameters({prompt:'select_account'}); } 
+                else if(p==='discord') provider = new firebase.auth.OAuthProvider('discord.com'); 
+                
+                const r = await auth.signInWithPopup(provider); 
+                currentUser = r.user; 
+                isGuest = false; 
+                localStorage.setItem('auracard_last_login', Date.now()); 
+                
+                // Ensure users document exists in Firestore
+                const uRef = db.collection('users').doc(r.user.uid);
+                const uSnap = await uRef.get();
+                if (!uSnap.exists) {
+                    const fallbackUser = (r.user.displayName || r.user.email.split('@')[0]).toLowerCase().replace(/[^a-z0-9_]/g, '');
+                    await uRef.set({
+                        username: fallbackUser,
+                        email: r.user.email || '',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                closeAuthModal(); 
+                showScreen('dashboard-screen'); 
+            } catch(e) { 
+                alert(`Login failed: ` + e.message); 
+            } 
+        }
         
         document.getElementById('googleLoginBtn').addEventListener('click', () => loginWithProvider('google'));
         document.getElementById('githubLoginBtn').addEventListener('click', () => loginWithProvider('github'));
@@ -557,7 +592,74 @@
         
         document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); currentUser = null; isGuest = false; localStorage.removeItem('auracard_last_login'); showScreen('login-screen'); });
 
-        function showSupportSoon() { alert("☕ The donation page is being set up and will be live tomorrow! Thank you for wanting to support AuraCard! 👑"); }
+        // ☕ Kulhad Support Page Launch
+        function showSupportSoon() { 
+            window.open("https://kulhad.co/dano-dev", "_blank");
+        }
+
+        // 💬 FEEDBACK FUNCTIONS
+        function openFeedbackModal() {
+            document.getElementById('feedback-modal').classList.add('active');
+            if (currentUser && currentUser.email && !currentUser.isGuest) {
+                document.getElementById('feedback-email').value = currentUser.email;
+            }
+        }
+        function closeFeedbackModal() {
+            document.getElementById('feedback-modal').classList.remove('active');
+            document.getElementById('feedback-text').value = '';
+        }
+        async function submitFeedback() {
+            const email = document.getElementById('feedback-email').value.trim();
+            const text = document.getElementById('feedback-text').value.trim();
+            if (!text) return alert("Please type some feedback before sending!");
+            const btn = document.getElementById('submit-feedback-btn');
+            btn.innerText = "Sending..."; btn.disabled = true;
+            try {
+                await db.collection('feedback').add({
+                    email: email || (currentUser ? currentUser.email : "anonymous"),
+                    feedback: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Thank you for your feedback! Dano will review it soon 👑");
+                closeFeedbackModal();
+            } catch(e) {
+                alert("Could not send feedback: " + e.message);
+            } finally {
+                btn.innerText = "Send"; btn.disabled = false;
+            }
+        }
+
+        // 👑 ADMIN FUNCTIONS
+        async function openAdminModal() {
+            if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) {
+                return alert("Access restricted to Admins only.");
+            }
+            const modal = document.getElementById('admin-modal');
+            const list = document.getElementById('admin-feedback-list');
+            list.innerHTML = "<p style='color:var(--muted);'>Loading feedback...</p>";
+            modal.classList.add('active');
+            try {
+                const snap = await db.collection('feedback').orderBy('timestamp', 'desc').limit(20).get();
+                if (snap.empty) {
+                    list.innerHTML = "<p style='color:var(--muted);'>No feedback messages yet.</p>";
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    list.innerHTML += `
+                        <div style="background:#15151a;padding:12px;border-radius:8px;margin-bottom:10px;border:1px solid #333;text-align:left;">
+                            <div style="font-size:12px;color:var(--accent);font-weight:bold;margin-bottom:4px;">${data.email || 'Anonymous'}</div>
+                            <div style="font-size:14px;color:#fff;word-break:break-word;">${data.feedback}</div>
+                        </div>`;
+                });
+            } catch(e) {
+                list.innerHTML = `<p style='color:#ff5252;'>Error loading feedback: ${e.message}</p>`;
+            }
+        }
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.remove('active');
+        }
 
         function getPlatformIconSVG(p) { if(p==='minecraft')return `<svg class="lb-icon" viewBox="0 0 100 100"><polygon points="50,15 85,32 50,50 15,32" fill="#6DAC44"/><polygon points="15,32 50,50 50,85 15,65" fill="#8B5A2B"/><polygon points="50,50 85,32 85,65 50,85" fill="#5c402c"/><polygon points="15,32 25,37 25,45 20,48 15,40" fill="#6DAC44"/><polygon points="30,42 40,47 40,55 35,58 30,50" fill="#6DAC44"/><polygon points="50,50 65,42 65,50 55,58 50,54" fill="#6DAC44"/><polygon points="75,40 85,32 85,40 80,45 75,42" fill="#6DAC44"/></svg>`; if(p==='bedrock')return `<svg class="lb-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#8B5A2B"/><rect width="16" height="5" fill="#5D9C3F"/></svg>`; if(p==='roblox')return `<svg class="lb-icon" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0074FF"/><rect x="30" y="30" width="40" height="40" fill="#FFFFFF" transform="rotate(15 50 50)"/><rect x="36" y="36" width="28" height="28" fill="#0074FF" transform="rotate(15 50 50)"/></svg>`; return `<svg class="lb-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`; }
         
@@ -573,14 +675,14 @@
             let isValid = false;
             try {
                 let url = ''; let body = { username: username };
-                if (currentPlatform === 'roblox') { url = 'https://auracard-backend-kzgy.onrender.com/api/roblox_stats'; body.most_played_game = document.getElementById('input-game').value.trim() || "Rivals"; body.games_won = document.getElementById('input-won').value.trim() || "0"; }
-                else if (currentPlatform === 'youtube') { url = 'https://auracard-backend-kzgy.onrender.com/api/yt_stats'; }
-                else if (currentPlatform === 'minecraft') { url = 'https://auracard-backend-kzgy.onrender.com/api/java_skin'; }
-                else if (currentPlatform === 'bedrock') { url = 'https://auracard-backend-kzgy.onrender.com/api/bedrock_stats'; }
+                if (currentPlatform === 'roblox') { url = `${BACKEND_URL}/api/roblox_stats`; body.most_played_game = document.getElementById('input-game').value.trim() || "Rivals"; body.games_won = document.getElementById('input-won').value.trim() || "0"; }
+                else if (currentPlatform === 'youtube') { url = `${BACKEND_URL}/api/yt_stats`; }
+                else if (currentPlatform === 'minecraft') { url = `${BACKEND_URL}/api/java_skin`; }
+                else if (currentPlatform === 'bedrock') { url = `${BACKEND_URL}/api/bedrock_stats`; }
                 const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
                 const data = await res.json();
-                if (data.success) { isValid = true; window.realData = data; } else { err.innerText = data.error; err.style.display = 'block'; }
-            } catch (e) { err.innerText = "Cannot connect to Backend."; err.style.display = 'block'; }
+                if (data.success) { isValid = true; window.realData = data; } else { err.innerText = data.error || "Validation failed"; err.style.display = 'block'; }
+            } catch (e) { err.innerText = "Cannot connect to Backend. Ensure Vercel server is running."; err.style.display = 'block'; }
             btn.innerText = "Validate"; if (isValid) { validatedUsername = username; closeModal(); await generateCard(); }
         }
 
@@ -589,7 +691,7 @@
             if (window.realData) {
                 const d = window.realData; title = d.title || "Player"; titleColor = (d.aura_level >= 100) ? '#ffd700' : '#00e5ff'; bio = d.description || "No bio set.";
                 if (currentPlatform === 'roblox') { stat1 = d.games_played || "0"; stat2 = d.games_won || "0"; stat3 = d.aura_streak || "0x"; stat4 = d.most_played_game || "Rivals"; stat5 = d.friends !== undefined ? d.friends : "0"; label1 = "GAMES PLAYED"; label2 = "GAMES WON"; label3 = "AURA STREAK"; label4 = "MOST PLAYED"; label5 = "FRIENDS"; }
-                else if (currentPlatform === 'youtube') { stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level); stat2 = d.subs.toLocaleString(); stat3 = d.views.toLocaleString(); stat4 = "YouTube"; stat5 = "Creator"; label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS"; }
+                else if (currentPlatform === 'youtube') { stat1 = "Lvl " + (d.aura_display !== undefined ? d.aura_display : d.aura_level); stat2 = (d.subs || 0).toLocaleString(); stat3 = (d.views || 0).toLocaleString(); stat4 = "YouTube"; stat5 = "Creator"; label1 = "AURA LEVEL"; label2 = "SUBSCRIBERS"; label3 = "TOTAL VIEWS"; label4 = "PLATFORM"; label5 = "STATUS"; }
                 else { stat1 = d.blocks_mined || "0"; stat2 = d.mobs_killed || "0"; stat3 = d.diamonds_found || "0"; stat4 = currentPlatform.toUpperCase(); stat5 = d.playtime || "0 Hours"; label1 = "BLOCKS MINED"; label2 = "MOBS KILLED"; label3 = "DIAMONDS"; label4 = "PLATFORM"; label5 = "PLAYTIME"; }
                 if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } else { funkPlayer.src = FUNK_LOW; }
             } else { funkPlayer.src = FUNK_LOW; }
@@ -600,14 +702,43 @@
             ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 50px "Montserrat", sans-serif'; ctx.fillText("AURACARD", 50, 80);
             ctx.fillStyle = '#fff'; ctx.font = 'bold 30px "Montserrat", sans-serif'; ctx.fillText(validatedUsername, 50, 130);
             ctx.fillStyle = titleColor; ctx.font = 'bold 20px "Roboto", sans-serif'; ctx.fillText(title.toUpperCase(), 50, 160);
-            if (window.realData && window.realData.avatar_url) { const avatarImg = await loadImage(window.realData.avatar_url); if (avatarImg) { const centerX = 740, centerY = 280; const gradient = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, 200); gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); ctx.fillStyle = gradient; ctx.fillRect(centerX - 200, centerY - 200, 400, 400); ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(centerX, centerY + 120, 100, 25, 0, 0, Math.PI * 2); ctx.stroke(); const avatarSize = 300; ctx.drawImage(avatarImg, centerX - (avatarSize/2), centerY - (avatarSize/2) - 20, avatarSize, avatarSize); } }
+            
+            if (window.realData && window.realData.avatar_url) { 
+                const avatarImg = await loadImage(window.realData.avatar_url); 
+                if (avatarImg) { 
+                    try {
+                        const centerX = 740, centerY = 280; 
+                        const gradient = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, 200); 
+                        gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); 
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); 
+                        ctx.fillStyle = gradient; 
+                        ctx.fillRect(centerX - 200, centerY - 200, 400, 400); 
+                        ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)'; 
+                        ctx.lineWidth = 3; 
+                        ctx.beginPath(); 
+                        ctx.ellipse(centerX, centerY + 120, 100, 25, 0, 0, Math.PI * 2); 
+                        ctx.stroke(); 
+                        const avatarSize = 300; 
+                        ctx.drawImage(avatarImg, centerX - (avatarSize/2), centerY - (avatarSize/2) - 20, avatarSize, avatarSize); 
+                    } catch(err) {}
+                } 
+            }
+            
             ctx.fillStyle = '#191920'; ctx.fillRect(50, 380, 800, 180); ctx.strokeStyle = '#32323c'; ctx.strokeRect(50, 380, 800, 180);
             ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; ctx.fillText(label1, 80, 410); ctx.fillText(label2, 300, 410); ctx.fillText(label3, 520, 410);
             ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 28px "Montserrat", sans-serif'; ctx.fillText(stat1, 80, 440); ctx.fillStyle = '#ff6464'; ctx.fillText(stat2, 300, 440); ctx.fillStyle = '#fff'; ctx.fillText(stat3, 520, 440);
             ctx.fillStyle = '#969696'; ctx.font = '14px "Roboto", sans-serif'; ctx.fillText(label4, 80, 490); ctx.fillText(label5, 300, 490);
             ctx.fillStyle = '#ffd700'; ctx.font = 'bold 24px "Montserrat", sans-serif'; ctx.fillText(stat4, 80, 520); ctx.fillStyle = '#fff'; ctx.fillText(stat5, 300, 520);
             ctx.fillStyle = '#a0a0a5'; ctx.font = '16px "Roboto", sans-serif'; let words = bio.split(' '), line = '', y = 210; for(let n = 0; n < words.length; n++) { let testLine = line + words[n] + ' '; if (ctx.measureText(testLine).width > 450 && n > 0) { ctx.fillText(line, 50, y); line = words[n] + ' '; y += 24; } else { line = testLine; } } ctx.fillText(line, 50, y);
-            const largePreview = document.getElementById('large-preview'); const compressedImage = canvas.toDataURL('image/jpeg', 0.8); largePreview.src = compressedImage; largePreview.style.display = 'block';
+            
+            const largePreview = document.getElementById('large-preview'); 
+            let compressedImage = '';
+            try {
+                compressedImage = canvas.toDataURL('image/jpeg', 0.8);
+            } catch(e) {
+                compressedImage = canvas.toDataURL();
+            }
+            largePreview.src = compressedImage; largePreview.style.display = 'block';
             document.getElementById('card-viewer').classList.add('active'); document.getElementById('uploadBtn').style.display = 'block'; document.getElementById('shareBtn').style.display = 'none';
             window.generatedCardData = { image: compressedImage, platform: currentPlatform, username: validatedUsername, level: parseInt(String(stat1).replace("Lvl ", "")) || (window.realData && window.realData.aura_level) || 0, bio: bio };
         }
@@ -627,30 +758,49 @@
             try {
                 const doc = await db.collection('auracards').doc(docId).get();
                 if (doc.exists) { const data = doc.data(); window.leaderboardCache[doc.id] = data; viewLeaderboardCard(doc.id); } 
-                else { alert("auracard not generated go signin or login and generate"); }
+                else { alert("AuraCard not generated for this user yet! Please create one."); }
             } catch (e) { alert("Error searching: " + e.message); }
         }
 
+        // Leaderboard with fallback in-memory sorting
         function loadLeaderboard(platform) {
             const list = document.getElementById('leaderboard-content'); list.innerHTML = `<p style="text-align: center; color: var(--muted);">Loading...</p>`; if (!db) return;
-            db.collection('auracards').where('platform', '==', platform).orderBy('wins', 'desc').limit(10).get().then((snap) => {
-                list.innerHTML = ""; if (snap.empty) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
-                let rank = 1; snap.forEach((doc) => {
-                    const data = doc.data(); window.leaderboardCache[doc.id] = data;
-                    const isDev = DEV_USERNAMES.includes(data.username.toLowerCase()) || ADMIN_EMAILS.includes(data.user);
+            
+            function renderDocs(docs) {
+                list.innerHTML = ""; 
+                if (docs.length === 0) { list.innerHTML = `<p style="text-align: center; color: var(--muted);">No cards yet. Be the first!</p>`; return; }
+                let rank = 1; 
+                docs.forEach((docData) => {
+                    window.leaderboardCache[docData.id] = docData;
+                    const isDev = DEV_USERNAMES.includes(docData.username.toLowerCase()) || ADMIN_EMAILS.includes(docData.user);
                     const color = rank === 1 ? 'var(--gold)' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff';
-                    const winLabel = (data.platform === 'youtube' && data.wins >= 9999) ? '∞' : 'Lvl ' + data.wins;
+                    const winLabel = (docData.platform === 'youtube' && docData.wins >= 9999) ? '∞' : 'Lvl ' + docData.wins;
                     let crown = rank === 1 ? '👑' : ''; let rowClass = rank === 1 ? 'lb-card rank-1' : 'lb-card'; let devBadge = '';
                     if (isDev) { rowClass = 'lb-card dev-card'; devBadge = `<span style="background: var(--accent); color: #000; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 900;">DEV</span>`; crown = '🛠️'; }
-                    const iconSVG = getPlatformIconSVG(data.platform);
-                    list.innerHTML += `<div class="${rowClass}" onclick="viewLeaderboardCard('${doc.id}')"><div class="lb-left"><span class="lb-rank">${crown} #${rank}</span>${iconSVG}<span class="lb-name">${data.username} ${devBadge}</span></div><span class="lb-level" style="color: ${color};">${winLabel}</span></div>`; rank++;
+                    const iconSVG = getPlatformIconSVG(docData.platform);
+                    list.innerHTML += `<div class="${rowClass}" onclick="viewLeaderboardCard('${docData.id}')"><div class="lb-left"><span class="lb-rank">${crown} #${rank}</span>${iconSVG}<span class="lb-name">${docData.username} ${devBadge}</span></div><span class="lb-level" style="color: ${color};">${winLabel}</span></div>`; 
+                    rank++;
                 });
-            }).catch((err) => { 
-                console.error(err);
-                const match = err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/);
-                if (match) { list.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 16px;">Database index needed!<br><br><a href="${match[0]}" target="_blank" style="color: #00e5ff; font-weight: bold; text-decoration: underline;">CLICK HERE TO CREATE IT</a></p>`; } 
-                else { list.innerHTML = `<p style="text-align: center; color: #ff5252;">Error: ${err.message}</p>`; }
-            });
+            }
+
+            db.collection('auracards').where('platform', '==', platform).orderBy('wins', 'desc').limit(10).get()
+                .then((snap) => {
+                    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderDocs(docs);
+                })
+                .catch((err) => { 
+                    console.warn("Index warning, falling back to client sort:", err.message);
+                    // Safe fallback without composite index requirement
+                    db.collection('auracards').where('platform', '==', platform).get()
+                        .then((fallbackSnap) => {
+                            const docs = fallbackSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                            docs.sort((a,b) => (b.wins || 0) - (a.wins || 0));
+                            renderDocs(docs.slice(0, 10));
+                        })
+                        .catch(fallbackErr => {
+                            list.innerHTML = `<p style="text-align: center; color: #ff5252;">Error: ${fallbackErr.message}</p>`;
+                        });
+                });
         }
 
         function viewLeaderboardCard(docId) {
