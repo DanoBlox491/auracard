@@ -1006,16 +1006,40 @@ body {
             if (isPlaying) { btn.innerText = '🔊 Music On'; btn.style.background = 'var(--green)'; } 
             else { btn.innerText = '🔇 Click to Play Music'; btn.style.background = '#ff5252'; } 
         }
-        async function tryAutoplayMusic() { try { funkPlayer.volume = 0.5; await funkPlayer.play(); updateMusicUI(true); } catch (err) { updateMusicUI(false); } }
-        function toggleMusic() { 
-            if (!funkPlayer.src || funkPlayer.src === "") { funkPlayer.src = FUNK_LOW; }
-            if (funkPlayer.paused) { 
-                funkPlayer.volume = 0.5; 
-                funkPlayer.play().then(() => updateMusicUI(true)).catch(e => { 
-                    if (e.name !== 'AbortError') { updateMusicUI(false); }
-                }); 
-            } else { funkPlayer.pause(); updateMusicUI(false); } 
+        // Autoplay is intentionally not forced: browsers require a user gesture for audible playback.
+        function toggleMusic() {
+            if (!funkPlayer.getAttribute('src')) funkPlayer.src = FUNK_LOW;
+
+            if (!funkPlayer.paused) {
+                funkPlayer.pause();
+                updateMusicUI(false);
+                return;
+            }
+
+            funkPlayer.volume = 0.5;
+            const playAttempt = funkPlayer.play();
+            if (playAttempt && typeof playAttempt.then === 'function') {
+                playAttempt.then(() => {
+                    updateMusicUI(true);
+                }).catch(err => {
+                    updateMusicUI(false);
+                    const btn = document.getElementById('musicToggle');
+                    if (btn) {
+                        btn.innerText = err.name === 'NotAllowedError'
+                            ? '▶ Tap to Play Music'
+                            : '⚠ Music unavailable — retry';
+                    }
+                    console.warn('AuraCard music playback failed:', err);
+                });
+            }
         }
+
+        funkPlayer.addEventListener('playing', () => updateMusicUI(true));
+        funkPlayer.addEventListener('pause', () => updateMusicUI(false));
+        funkPlayer.addEventListener('error', () => {
+            updateMusicUI(false);
+            console.warn('AuraCard audio file could not be loaded:', funkPlayer.error);
+        });
 
         function showScreen(screenId) { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
@@ -1311,7 +1335,7 @@ body {
                 if (d.aura_level >= 100) { funkPlayer.src = FUNK_HIGH; } else if (d.aura_level >= 50) { funkPlayer.src = FUNK_MID; } else { funkPlayer.src = FUNK_LOW; }
             } else { funkPlayer.src = FUNK_LOW; }
             
-            funkPlayer.load(); tryAutoplayMusic();
+            funkPlayer.load(); updateMusicUI(false);
             const canvas = document.getElementById('card-canvas'); canvas.width = 900; canvas.height = 600; const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#0f0f13'; ctx.fillRect(0, 0, 900, 600); ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, 880, 580);
             ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 50px "Montserrat", sans-serif'; ctx.fillText("AURACARD", 50, 80);
@@ -1468,7 +1492,7 @@ body {
             else if (data.wins >= 50) { funkPlayer.src = FUNK_MID; } 
             else { funkPlayer.src = FUNK_LOW; }
             
-            funkPlayer.load(); tryAutoplayMusic();
+            funkPlayer.load(); updateMusicUI(false);
         }
 
         // 🧠 SAFE AUTH STATE LISTENER (Restores session smoothly without crashing)
