@@ -1581,7 +1581,7 @@ body {
       const snap=await ref.get();window.currentAuraCardData={id:d.id,...snap.data()};renderReactions(window.currentAuraCardData);
     }catch(e){alert('Reaction failed: '+e.message);}
   };
-  function renderReactions(d){const el=document.getElementById('auracard-reactions');if(!el)return;el.style.display='flex';document.getElementById('aura-likes').textContent=Number(d.likes||0);document.getElementById('aura-dislikes').textContent=Number(d.dislikes||0);document.getElementById('aura-created-by').textContent='By '+(d.creatorName||'AuraCard creator');}
+  function renderReactions(d){const el=document.getElementById('auracard-reactions');if(!el)return;el.style.display='flex';document.getElementById('aura-likes').textContent=Number(d.likes||0);document.getElementById('aura-dislikes').textContent=Number(d.dislikes||0);document.getElementById('aura-created-by').textContent='By '+(d.creatorName||'AuraCard creator');let del=document.getElementById('delete-own-auracard');if(d.user===currentUser?.uid&&!del){del=document.createElement('button');del.id='delete-own-auracard';del.textContent='Delete my AuraCard';del.onclick=window.deleteOwnAuraCard;el.appendChild(del);}else if(d.user!==currentUser?.uid&&del)del.remove();}
   function renderProfileDetails(profile,card){
     let panel=document.getElementById('auracard-profile-details');if(!panel){panel=document.createElement('section');panel.id='auracard-profile-details';panel.className='auracard-reactions';const anchor=document.getElementById('auracard-reactions');anchor?.insertAdjacentElement('afterend',panel);}
     const bio=String(profile.bio||card.bio||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -1636,9 +1636,30 @@ body {
       alert('No AuraCard found for that username.');
     }catch(e){alert('Search failed: '+e.message);}
   };
+  window.manageAuraAlts=async function(){
+    if(!currentUser){alert('Sign in first.');return;}
+    const ref=db.collection('users').doc(currentUser.uid),snap=await ref.get(),profile=snap.exists?snap.data():{},alts=profile.altAccounts||[];
+    const action=prompt('Type ADD to add an alt account, or REMOVE to delete one.\nCurrent alts: '+alts.map((a,i)=>(i+1)+'. '+a.platform+': '+a.username).join('\n'));
+    if(!action)return;
+    if(action.toUpperCase()==='ADD'){
+      const platform=prompt('Platform:');if(!platform)return;const username=prompt('Alt username:');if(!username)return;
+      alts.push({platform:platform.slice(0,30),username:username.slice(0,50),addedAt:new Date().toISOString()});
+    }else if(action.toUpperCase()==='REMOVE'){
+      const index=Number(prompt('Enter the number of the alt account to remove:'))-1;if(!Number.isInteger(index)||index<0||index>=alts.length){alert('Invalid selection.');return;}
+      if(prompt('Type REMOVE to confirm deleting '+alts[index].username)!=='REMOVE')return;alts.splice(index,1);
+    }else{return;}
+    await ref.set({altAccounts:alts,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    alert('Alt accounts updated.');
+  };
+  window.deleteOwnAuraCard=async function(){
+    const d=window.currentAuraCardData;if(!currentUser||!d||d.user!==currentUser.uid){alert('You can only delete your own AuraCard.');return;}
+    if(prompt('This permanently deletes your AuraCard. Type DELETE to confirm:')!=='DELETE')return;
+    try{await db.collection('auracards').doc(d.id).delete();await db.collection('users').doc(currentUser.uid).delete();window.currentAuraCardData=null;closeViewer();showScreen('dashboard-screen');alert('Your AuraCard was deleted.');}
+    catch(e){alert('Deletion failed: '+e.message);}
+  };
   document.addEventListener('DOMContentLoaded',function(){
     document.querySelectorAll('.platform-card').forEach(card=>{const m=card.getAttribute('onclick')?.match(/selectPlatform\('([^']+)'\)/),key=m&&m[1],src=LOGOS[key];if(src){const old=card.querySelector('.platform-logo');if(old){const img=document.createElement('img');img.className='platform-logo';img.alt=key+' logo';img.src=src;old.replaceWith(img);}}});
-    const nav=document.querySelector('.nav-user');if(nav&&!document.getElementById('aura-profile-edit')){const edit=document.createElement('button');edit.id='aura-profile-edit';edit.className='feedback-btn';edit.textContent='✏️ Profile';edit.onclick=window.openAuraProfileEditor;nav.insertBefore(edit,nav.querySelector('.logout-btn'));const add=document.createElement('button');add.className='feedback-btn';add.textContent='＋ Add game';add.onclick=window.addAuraGameToProfile;nav.insertBefore(add,nav.querySelector('.logout-btn'));}
+    const nav=document.querySelector('.nav-user');if(nav&&!document.getElementById('aura-profile-edit')){const edit=document.createElement('button');edit.id='aura-profile-edit';edit.className='feedback-btn';edit.textContent='✏️ Profile';edit.onclick=window.openAuraProfileEditor;nav.insertBefore(edit,nav.querySelector('.logout-btn'));const add=document.createElement('button');add.className='feedback-btn';add.textContent='＋ Add game';add.onclick=window.addAuraGameToProfile;nav.insertBefore(add,nav.querySelector('.logout-btn'));const alts=document.createElement('button');alts.className='feedback-btn';alts.textContent='Alt accounts';alts.onclick=window.manageAuraAlts;nav.insertBefore(alts,nav.querySelector('.logout-btn'));}
   });
 })();
 </script>
