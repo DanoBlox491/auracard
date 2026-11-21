@@ -1582,6 +1582,13 @@ body {
     }catch(e){alert('Reaction failed: '+e.message);}
   };
   function renderReactions(d){const el=document.getElementById('auracard-reactions');if(!el)return;el.style.display='flex';document.getElementById('aura-likes').textContent=Number(d.likes||0);document.getElementById('aura-dislikes').textContent=Number(d.dislikes||0);document.getElementById('aura-created-by').textContent='By '+(d.creatorName||'AuraCard creator');}
+  function renderProfileDetails(profile,card){
+    let panel=document.getElementById('auracard-profile-details');if(!panel){panel=document.createElement('section');panel.id='auracard-profile-details';panel.className='auracard-reactions';const anchor=document.getElementById('auracard-reactions');anchor?.insertAdjacentElement('afterend',panel);}
+    const bio=String(profile.bio||card.bio||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    const games=(profile.games||card.games||[]).map(g=>'<li>'+String(g.platform||'Game')+' · '+String(g.name||g.username||'Game')+' — '+String(g.username||'')+' ('+String(g.verificationStatus||'unverified')+')</li>').join('');
+    const links=(profile.links||card.links||[]).filter(x=>/^https?:\/\//i.test(x)).map(x=>'<a href="'+x.replace(/"/g,'')+'" target="_blank" rel="noopener noreferrer">'+x.replace(/[<>&"]/g,'')+'</a>').join(' · ');
+    panel.innerHTML='<div><strong>About</strong><p>'+bio+'</p><strong>Games & servers</strong><ul>'+games+'</ul><div>'+links+'</div></div>';
+  }
   window.openAuraProfileEditor=async function(){
     if(!currentUser){alert('Sign in first.');return;}const ref=db.collection('users').doc(currentUser.uid),snap=await ref.get(),profile=snap.exists?snap.data():{};
     const bio=prompt('Your AuraCard bio (max 280 characters):',profile.bio||'');if(bio===null)return;
@@ -1592,11 +1599,11 @@ body {
   window.addAuraGameToProfile=async function(){
     if(!currentUser)throw Error('Sign in first.');const name=prompt('Game or server name:');if(!name)return;const platform=prompt('Platform (Roblox, Minecraft, Steam, etc.):');if(!platform)return;const username=prompt('Your username on that game:');if(!username)return;
     const entry={name:name.slice(0,70),platform:platform.slice(0,30),username:username.slice(0,50),verificationStatus:'unverified',addedAt:new Date().toISOString()};
-    await db.collection('users').doc(currentUser.uid).set({games:firebase.firestore.FieldValue.arrayUnion(entry)},{merge:true});alert('Game added to your AuraCard profile.');
+    const profileRef=db.collection('users').doc(currentUser.uid);await profileRef.set({games:firebase.firestore.FieldValue.arrayUnion(entry)},{merge:true});await db.collection('auracards').doc('user_'+currentUser.uid).set({user:currentUser.uid,games:firebase.firestore.FieldValue.arrayUnion(entry),creatorName:currentUser.displayName||'Google account'},{merge:true});alert('Game added to your AuraCard profile.');
   };
   window.currentAuraCardData=null;
   const oldView=window.viewLeaderboardCard;
-  window.viewLeaderboardCard=async function(id){if(oldView)oldView(id);try{const snap=await db.collection('auracards').doc(id).get();if(!snap.exists)return;window.currentAuraCardData={id,...snap.data()};renderReactions(window.currentAuraCardData);}catch(e){console.warn(e);}};
+  window.viewLeaderboardCard=async function(id){if(oldView)oldView(id);try{const snap=await db.collection('auracards').doc(id).get();if(!snap.exists)return;window.currentAuraCardData={id,...snap.data()};renderReactions(window.currentAuraCardData);if(window.currentAuraCardData.user){const p=await db.collection('users').doc(window.currentAuraCardData.user).get();renderProfileDetails(p.exists?p.data():{},window.currentAuraCardData);}}catch(e){console.warn(e);}};
   window.uploadCurrentCard=async function(){
     if(isGuest||!currentUser){alert('Sign in to upload an AuraCard.');return;}
     const d=window.generatedCardData;if(!d){alert('Generate a card first.');return;}
