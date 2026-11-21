@@ -1558,152 +1558,66 @@ body {
 
 <script id="auracard-2-features">
 (function(){
-  const PLATFORM_LOGOS = {
-    roblox:'https://cdn.simpleicons.org/roblox/FFFFFF',
-    minecraft:'https://cdn.simpleicons.org/minecraft/62B44A',
-    bedrock:'https://cdn.simpleicons.org/minecraft/62B44A',
-    youtube:'https://cdn.simpleicons.org/youtube/FF0033',
-    steam:'https://cdn.simpleicons.org/steam/FFFFFF',
-    xbox:'https://cdn.simpleicons.org/xbox/107C10',
-    playstation:'https://cdn.simpleicons.org/playstation/FFFFFF',
-    discord:'https://cdn.simpleicons.org/discord/5865F2',
-    epicgames:'https://cdn.simpleicons.org/epicgames/FFFFFF'
+  const LOGOS={roblox:'https://cdn.simpleicons.org/roblox/FFFFFF',minecraft:'https://cdn.simpleicons.org/minecraft/62B44A',bedrock:'https://cdn.simpleicons.org/minecraft/62B44A',youtube:'https://cdn.simpleicons.org/youtube/FF0033',steam:'https://cdn.simpleicons.org/steam/FFFFFF',xbox:'https://cdn.simpleicons.org/xbox/107C10',playstation:'https://cdn.simpleicons.org/playstation/FFFFFF',discord:'https://cdn.simpleicons.org/discord/5865F2',epicgames:'https://cdn.simpleicons.org/epicgames/FFFFFF'};
+  const oldIcon=window.getPlatformIconSVG;
+  window.getPlatformIconSVG=function(p){const src=LOGOS[String(p||'').toLowerCase()];return src?'<img class="lb-icon" src="'+src+'" alt="'+String(p).replace(/[<>&"]/g,'')+' logo" loading="lazy">':(oldIcon?oldIcon(p):'🎮');};
+  function cleanLinks(raw){return String(raw||'').split(/[\\n,]+/).map(x=>x.trim()).filter(x=>{try{const u=new URL(x);return u.protocol==='https:'||u.protocol==='http:';}catch(_){return false;}}).slice(0,8);}
+  window.checkAuraScreenshot=async function(){
+    const input=document.getElementById('verification-screenshot'),out=document.getElementById('verification-result'),file=input&&input.files&&input.files[0];
+    if(!file){out.textContent='Choose a screenshot first.';return;}if(file.size>5*1024*1024){out.textContent='Image must be 5 MB or smaller.';return;}
+    if(!/^image\\/(png|jpeg|webp)$/.test(file.type)){out.textContent='Use PNG, JPG or WebP.';return;}
+    out.textContent='Reading screenshot locally with free OCR…';
+    try{if(!window.Tesseract)await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(Error('Could not load OCR library'));document.head.appendChild(s);});
+      const o=await Tesseract.recognize(file,'eng'),text=String(o.data.text||'').toLowerCase(),username=String(document.getElementById('input-username').value||'').trim().replace(/^@/,'').toLowerCase();
+      if(!username){out.textContent='Enter the in-game username first.';return;}
+      window.auraEvidenceCheck={status:text.includes(username)?'evidence_matched':'needs_review',username,checkedAt:new Date().toISOString()};
+      out.textContent=text.includes(username)?'Username text found. Evidence check passed; this is not official proof of ownership.':'Username not detected. Try a clearer screenshot or request manual review.';
+    }catch(e){out.textContent='OCR check unavailable: '+e.message;}
   };
-  const originalIcon = window.getPlatformIconSVG;
-  window.getPlatformIconSVG = function(platform){
-    const src=PLATFORM_LOGOS[String(platform||'').toLowerCase()];
-    if(!src) return originalIcon ? originalIcon(platform) : '<span class="lb-icon" aria-hidden="true">🎮</span>';
-    const safeAlt=String(platform).replace(/[<>&"]/g,'');
-    return '<img class="lb-icon" src="'+src+'" alt="'+safeAlt+' logo" loading="lazy" referrerpolicy="no-referrer">';
+  window.reactToAuraCard=async function(reaction){
+    const d=window.currentAuraCardData;if(!d||!d.id||!currentUser){alert('Sign in to react to an AuraCard.');return;}
+    if(d.user===currentUser.uid){alert('You cannot react to your own AuraCard.');return;}if(!['like','dislike'].includes(reaction))return;
+    try{const ref=db.collection('auracards').doc(d.id);await db.runTransaction(async tx=>{const snap=await tx.get(ref);if(!snap.exists)throw Error('AuraCard not found');const votes={...(snap.data().votes||{})},prev=votes[currentUser.uid];if(prev===reaction)delete votes[currentUser.uid];else votes[currentUser.uid]=reaction;const vals=Object.values(votes);tx.update(ref,{votes,likes:vals.filter(x=>x==='like').length,dislikes:vals.filter(x=>x==='dislike').length});});
+      const snap=await ref.get();window.currentAuraCardData={id:d.id,...snap.data()};renderReactions(window.currentAuraCardData);
+    }catch(e){alert('Reaction failed: '+e.message);}
   };
-  function safeLinks(raw){
-    return String(raw||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,8).filter(x=>{
-      try{const u=new URL(x);return u.protocol==='https:'||u.protocol==='http:';}catch(_){return false;}
-    });
-  }
-  window.checkAuraScreenshot = async function(){
-    const input=document.getElementById('verification-screenshot');
-    const result=document.getElementById('verification-result');
-    const file=input&&input.files&&input.files[0];
-    if(!file){result.textContent='Choose a screenshot first.';return;}
-    if(file.size>5*1024*1024){result.textContent='Please use an image smaller than 5 MB.';return;}
-    if(!/^image\/(png|jpeg|webp)$/.test(file.type)){result.textContent='Use a PNG, JPG or WebP screenshot.';return;}
-    result.textContent='Reading screenshot text locally…';
-    try{
-      if(!window.Tesseract){
-        await new Promise((resolve,reject)=>{
-          const s=document.createElement('script');
-          s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-          s.onload=resolve;s.onerror=()=>reject(new Error('Could not load the free OCR library.'));
-          document.head.appendChild(s);
-        });
-      }
-      const out=await Tesseract.recognize(file,'eng');
-      const text=String(out.data.text||'').toLowerCase();
-      const username=String(document.getElementById('input-username').value||'').trim().replace(/^@/,'').toLowerCase();
-      if(!username){result.textContent='Enter the game username before checking the screenshot.';return;}
-      if(text.includes(username)){
-        window.auraEvidenceCheck={status:'evidence_matched',checkedAt:new Date().toISOString(),username:username};
-        result.textContent='Username text found. Evidence check passed; this is NOT official platform ownership verification.';
-      }else{
-        window.auraEvidenceCheck={status:'needs_review',checkedAt:new Date().toISOString(),username:username};
-        result.textContent='Could not find that username in the screenshot. Try a clearer screenshot or request manual review.';
-      }
-    }catch(e){result.textContent='Screenshot check unavailable: '+e.message;}
+  function renderReactions(d){const el=document.getElementById('auracard-reactions');if(!el)return;el.style.display='flex';document.getElementById('aura-likes').textContent=Number(d.likes||0);document.getElementById('aura-dislikes').textContent=Number(d.dislikes||0);document.getElementById('aura-created-by').textContent='By '+(d.creatorName||'AuraCard creator');}
+  window.openAuraProfileEditor=async function(){
+    if(!currentUser){alert('Sign in first.');return;}const ref=db.collection('users').doc(currentUser.uid),snap=await ref.get(),profile=snap.exists?snap.data():{};
+    const bio=prompt('Your AuraCard bio (max 280 characters):',profile.bio||'');if(bio===null)return;
+    const links=prompt('Links (separate with commas):',(profile.links||[]).join(', '));if(links===null)return;
+    await ref.set({bio:bio.slice(0,280),links:cleanLinks(links),creatorName:currentUser.displayName||'Google account',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    window.currentAuraProfile={bio:bio.slice(0,280),links:cleanLinks(links)};alert('Profile saved.');
   };
-  window.reactToAuraCard = async function(reaction){
-    const data=window.currentAuraCardData;
-    if(!data||!data.id||!window.currentUser){alert('Sign in to react to an AuraCard.');return;}
-    if(data.user===window.currentUser.uid){alert('You cannot react to your own AuraCard.');return;}
-    if(!['like','dislike'].includes(reaction))return;
-    try{
-      const ref=db.collection('auracards').doc(data.id);
-      await db.runTransaction(async tx=>{
-        const snap=await tx.get(ref);if(!snap.exists)throw new Error('This AuraCard no longer exists.');
-        const current=snap.data();const votes=current.votes||{};
-        const previous=votes[window.currentUser.uid];
-        if(previous===reaction)delete votes[window.currentUser.uid];else votes[window.currentUser.uid]=reaction;
-        const counts=Object.values(votes).reduce((a,v)=>{if(v==='like')a.likes++;if(v==='dislike')a.dislikes++;return a;},{likes:0,dislikes:0});
-        tx.update(ref,{votes:votes,likes:counts.likes,dislikes:counts.dislikes});
-      });
-      const fresh=await ref.get();window.currentAuraCardData={id:data.id,...fresh.data()};
-      renderAuraReactions(window.currentAuraCardData);
-    }catch(e){alert('Could not save reaction: '+e.message);}
-  };
-  function renderAuraReactions(data){
-    const wrap=document.getElementById('auracard-reactions');if(!wrap)return;
-    wrap.style.display='flex';
-    document.getElementById('aura-likes').textContent=Number(data.likes||0);
-    document.getElementById('aura-dislikes').textContent=Number(data.dislikes||0);
-    const name=(window.currentUser&&(window.currentUser.displayName||window.currentUser.email||'Google account'))||'AuraCard creator';
-    document.getElementById('aura-created-by').textContent='By '+(data.creatorName||name);
-  }
-  window.openAuraProfileEditor = function(){
-    if(!window.currentUser){alert('Sign in to edit your profile.');return;}
-    const bio=prompt('Your AuraCard bio (max 280 characters):',window.currentAuraProfile?.bio||'');
-    if(bio===null)return;
-    const links=prompt('Add links separated by commas:',(window.currentAuraProfile?.links||[]).join(', '));
-    if(links===null)return;
-    const cleanLinks=safeLinks(links.replace(/,/g,'\n'));
-    db.collection('users').doc(window.currentUser.uid).set({
-      bio:bio.slice(0,280),links:cleanLinks,
-      creatorName:window.currentUser.displayName||'Google account',
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-    },{merge:true}).then(()=>{window.currentAuraProfile={bio:bio.slice(0,280),links:cleanLinks};alert('Profile details saved.');})
-      .catch(e=>alert('Could not save profile: '+e.message));
-  };
-  window.addAuraGameToProfile = async function(gameName,platform,gameUsername){
-    if(!window.currentUser)throw new Error('Sign in first.');
-    const name=String(gameName||'').trim().slice(0,70),user=String(gameUsername||'').trim().slice(0,50);
-    if(!name||!user)throw new Error('Game name and in-game username are required.');
-    const ref=db.collection('users').doc(window.currentUser.uid);
-    await ref.set({games:firebase.firestore.FieldValue.arrayUnion({name:name,platform:String(platform||'').slice(0,30),username:user,verificationStatus:'unverified',addedAt:new Date().toISOString()})},{merge:true});
-    return true;
+  window.addAuraGameToProfile=async function(){
+    if(!currentUser)throw Error('Sign in first.');const name=prompt('Game or server name:');if(!name)return;const platform=prompt('Platform (Roblox, Minecraft, Steam, etc.):');if(!platform)return;const username=prompt('Your username on that game:');if(!username)return;
+    const entry={name:name.slice(0,70),platform:platform.slice(0,30),username:username.slice(0,50),verificationStatus:'unverified',addedAt:new Date().toISOString()};
+    await db.collection('users').doc(currentUser.uid).set({games:firebase.firestore.FieldValue.arrayUnion(entry)},{merge:true});alert('Game added to your AuraCard profile.');
   };
   window.currentAuraCardData=null;
   const oldView=window.viewLeaderboardCard;
-  window.viewLeaderboardCard=async function(id){
-    if(typeof oldView==='function')oldView(id);
-    try{
-      const snap=await db.collection('auracards').doc(id).get();if(!snap.exists)return;
-      window.currentAuraCardData={id:id,...snap.data()};
-      renderAuraReactions(window.currentAuraCardData);
-    }catch(e){console.warn('AuraCard reactions could not load',e);}
-  };
-  const oldUpload=window.uploadCurrentCard;
+  window.viewLeaderboardCard=async function(id){if(oldView)oldView(id);try{const snap=await db.collection('auracards').doc(id).get();if(!snap.exists)return;window.currentAuraCardData={id,...snap.data()};renderReactions(window.currentAuraCardData);}catch(e){console.warn(e);}};
   window.uploadCurrentCard=async function(){
-    if(!window.currentUser||!window.generatedCardData)return oldUpload&&oldUpload();
-    const d=window.generatedCardData;
-    const bio=(document.getElementById('auracard-bio')?.value||'').trim().slice(0,280);
-    const links=safeLinks(document.getElementById('auracard-links')?.value);
-    const docId=String(d.platform)+'_'+String(d.username).toLowerCase();
-    const ref=db.collection('auracards').doc(docId);
+    if(isGuest||!currentUser){alert('Sign in to upload an AuraCard.');return;}const d=window.generatedCardData;if(!d){alert('Generate a card first.');return;}
+    const btn=document.getElementById('uploadBtn');btn.disabled=true;btn.textContent='Uploading…';
     try{
-      const existing=await ref.get();
-      if(existing.exists&&existing.data().user!==window.currentUser.uid){
-        alert('This game account already has an AuraCard owned by another account. You cannot overwrite it.');
-        return;
-      }
-      const creatorName=window.currentUser.displayName||'Google account';
-      const gameEntry={platform:d.platform,gameName:document.getElementById('input-game')?.value||d.platform,username:d.username,level:d.level||0,verificationStatus:window.auraEvidenceCheck?.status==='evidence_matched'?'evidence_matched':'unverified'};
-      const prior=existing.exists?(existing.data().games||[]):[];
-      const games=[...prior.filter(g=>!(g.platform===gameEntry.platform&&g.username.toLowerCase()===gameEntry.username.toLowerCase())),gameEntry];
-      await ref.set({
-        user:window.currentUser.uid,platform:d.platform,platforms:firebase.firestore.FieldValue.arrayUnion(d.platform),
-        username:d.username,wins:d.level||0,bio:bio||d.bio||'',links:links,
-        image:d.image,games:games,creatorName:creatorName,
-        verificationStatus:gameEntry.verificationStatus,
-        likes:existing.exists?(existing.data().likes||0):0,dislikes:existing.exists?(existing.data().dislikes||0):0,
-        votes:existing.exists?(existing.data().votes||{}):{},
-        timestamp:firebase.firestore.FieldValue.serverTimestamp()
-      },{merge:true});
-      window.generatedCardData.bio=bio||d.bio||'';
-      return oldUpload.call(this);
-    }catch(e){alert('AuraCard save failed: '+e.message);}
+      const id=d.platform+'_'+d.username.toLowerCase(),ref=db.collection('auracards').doc(id),existing=await ref.get();
+      if(existing.exists&&existing.data().user!==currentUser.uid)throw Error('That game account is already claimed by another AuraCard owner.');
+      const bio=(document.getElementById('auracard-bio').value||'').trim().slice(0,280)||d.bio||'';
+      const links=cleanLinks(document.getElementById('auracard-links').value);
+      const profileRef=db.collection('users').doc(currentUser.uid);
+      await profileRef.set({bio,links,creatorName:currentUser.displayName||'Google account',games:firebase.firestore.FieldValue.arrayUnion({platform:d.platform,name:document.getElementById('input-game')?.value||d.platform,username:d.username,verificationStatus:window.auraEvidenceCheck?.status||'unverified'})},{merge:true});
+      const prior=existing.exists?existing.data():{};
+      await ref.set({user:currentUser.uid,platform:d.platform,username:d.username,wins:d.level||0,bio,links,image:d.image,creatorName:currentUser.displayName||'Google account',
+        games:[...(prior.games||[]).filter(g=>!(g.platform===d.platform&&String(g.username).toLowerCase()===String(d.username).toLowerCase())),{platform:d.platform,name:document.getElementById('input-game')?.value||d.platform,username:d.username,verificationStatus:window.auraEvidenceCheck?.status||'unverified'}],
+        verificationStatus:window.auraEvidenceCheck?.status||'unverified',likes:prior.likes||0,dislikes:prior.dislikes||0,votes:prior.votes||{},timestamp:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      document.getElementById('upload-success').style.display='block';btn.textContent='Uploaded';document.getElementById('shareBtn').style.display='flex';
+      setTimeout(()=>{closeViewer();loadLeaderboard(currentPlatform);},1200);
+    }catch(e){alert('Upload failed: '+e.message);btn.disabled=false;btn.textContent='🚀 Upload to AuraCard';}
   };
   document.addEventListener('DOMContentLoaded',function(){
-    const userName=document.getElementById('user-name');
-    if(userName&&window.currentUser)userName.title='Signed in with Google';
+    document.querySelectorAll('.platform-card').forEach(card=>{const m=card.getAttribute('onclick')?.match(/selectPlatform\('([^']+)'\)/),key=m&&m[1],src=LOGOS[key];if(src){const old=card.querySelector('.platform-logo');if(old){const img=document.createElement('img');img.className='platform-logo';img.alt=key+' logo';img.src=src;old.replaceWith(img);}}});
+    const nav=document.querySelector('.nav-user');if(nav&&!document.getElementById('aura-profile-edit')){const edit=document.createElement('button');edit.id='aura-profile-edit';edit.className='feedback-btn';edit.textContent='✏️ Profile';edit.onclick=window.openAuraProfileEditor;nav.insertBefore(edit,nav.querySelector('.logout-btn'));const add=document.createElement('button');add.className='feedback-btn';add.textContent='＋ Add game';add.onclick=window.addAuraGameToProfile;nav.insertBefore(add,nav.querySelector('.logout-btn'));}
   });
 })();
 </script>
