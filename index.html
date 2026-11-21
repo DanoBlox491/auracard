@@ -1612,6 +1612,8 @@ body {
       const entry={platform:d.platform,name:document.getElementById('input-game')?.value||d.platform,username:d.username,level:d.level||0,verificationStatus:window.auraEvidenceCheck?.status||'unverified'};
       const profileRef=db.collection('users').doc(currentUser.uid),profileSnap=await profileRef.get(),profile=profileSnap.exists?profileSnap.data():{};
       const priorGames=profile.games||[];
+      const claimRef=db.collection('gameClaims').doc(entry.platform+'_'+String(entry.username).toLowerCase());
+      await db.runTransaction(async tx=>{const claim=await tx.get(claimRef);if(claim.exists&&claim.data().ownerUid!==currentUser.uid)throw Error('That game account is already claimed by another AuraCard owner.');tx.set(claimRef,{ownerUid:currentUser.uid,platform:entry.platform,username:entry.username,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});});
       const games=[...priorGames.filter(g=>!(g.platform===entry.platform&&String(g.username).toLowerCase()===String(entry.username).toLowerCase())),entry];
       const bio=(document.getElementById('auracard-bio').value||'').trim().slice(0,280)||profile.bio||d.bio||'';
       const links=cleanLinks(document.getElementById('auracard-links').value|| (profile.links||[]).join('\n'));
