@@ -1577,7 +1577,7 @@ body {
   window.reactToAuraCard=async function(reaction){
     const d=window.currentAuraCardData;if(!d||!d.id||!currentUser){alert('Sign in to react to an AuraCard.');return;}
     if(d.user===currentUser.uid){alert('You cannot react to your own AuraCard.');return;}if(!['like','dislike'].includes(reaction))return;
-    try{const ref=db.collection('auracards').doc(d.id);await db.runTransaction(async tx=>{const snap=await tx.get(ref);if(!snap.exists)throw Error('AuraCard not found');const votes={...(snap.data().votes||{})},prev=votes[currentUser.uid];if(prev===reaction)delete votes[currentUser.uid];else votes[currentUser.uid]=reaction;const vals=Object.values(votes);tx.update(ref,{votes,likes:vals.filter(x=>x==='like').length,dislikes:vals.filter(x=>x==='dislike').length});});
+    try{const ref=db.collection('auracards').doc(d.id),voteRef=ref.collection('votes').doc(currentUser.uid);await db.runTransaction(async tx=>{const snap=await tx.get(ref),vote=await tx.get(voteRef);if(!snap.exists)throw Error('AuraCard not found');const previous=vote.exists?vote.data().reaction:null,next=previous===reaction?null:reaction;let likes=Number(snap.data().likes||0),dislikes=Number(snap.data().dislikes||0);if(previous==='like')likes--;if(previous==='dislike')dislikes--;if(next==='like')likes++;if(next==='dislike')dislikes++;if(next)tx.set(voteRef,{reaction:next,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});else if(vote.exists)tx.delete(voteRef);tx.update(ref,{likes,dislikes});});
       const snap=await ref.get();window.currentAuraCardData={id:d.id,...snap.data()};renderReactions(window.currentAuraCardData);
     }catch(e){alert('Reaction failed: '+e.message);}
   };
@@ -1619,7 +1619,7 @@ body {
       const id='user_'+currentUser.uid,ref=db.collection('auracards').doc(id),existing=await ref.get(),prior=existing.exists?existing.data():{};
       await ref.set({user:currentUser.uid,username:d.username,usernameLower:String(d.username).toLowerCase(),platform:d.platform,platforms:firebase.firestore.FieldValue.arrayUnion(d.platform),
         wins:d.level||0,bio,links,image:d.image,creatorName:currentUser.displayName||'Google account',games,
-        likes:prior.likes||0,dislikes:prior.dislikes||0,votes:prior.votes||{},timestamp:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+        likes:prior.likes||0,dislikes:prior.dislikes||0,timestamp:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
       window.currentAuraCardData={id,...(await ref.get()).data()};
       document.getElementById('upload-success').style.display='block';btn.textContent='Uploaded';document.getElementById('shareBtn').style.display='flex';
       setTimeout(()=>{closeViewer();loadLeaderboard(currentPlatform);},1200);
