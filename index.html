@@ -1585,7 +1585,8 @@ body {
   function renderProfileDetails(profile,card){
     let panel=document.getElementById('auracard-profile-details');if(!panel){panel=document.createElement('section');panel.id='auracard-profile-details';panel.className='auracard-reactions';const anchor=document.getElementById('auracard-reactions');anchor?.insertAdjacentElement('afterend',panel);}
     const bio=String(profile.bio||card.bio||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-    const games=(profile.games||card.games||[]).map(g=>'<li>'+String(g.platform||'Game')+' · '+String(g.name||g.username||'Game')+' — '+String(g.username||'')+' ('+String(g.verificationStatus||'unverified')+')</li>').join('');
+    const esc=v=>String(v||'').replace(/[<>&\"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','\"':'&quot;'}[c]));
+    const games=(profile.games||card.games||[]).map(g=>'<li>'+esc(g.platform||'Game')+' · '+esc(g.name||g.username||'Game')+' — '+esc(g.username||'')+' ('+esc(g.verificationStatus||'unverified')+')</li>').join('');
     const links=(profile.links||card.links||[]).filter(x=>/^https?:\/\//i.test(x)).map(x=>'<a href="'+x.replace(/"/g,'')+'" target="_blank" rel="noopener noreferrer">'+x.replace(/[<>&"]/g,'')+'</a>').join(' · ');
     panel.innerHTML='<div><strong>About</strong><p>'+bio+'</p><strong>Games & servers</strong><ul>'+games+'</ul><div>'+links+'</div></div>';
   }
