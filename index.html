@@ -1465,10 +1465,10 @@ body {
             btn.disabled = true; 
             try { 
                 const uniqueDocId = `${window.generatedCardData.platform}_${window.generatedCardData.username.toLowerCase()}`; 
-                const safeLinks = (document.getElementById('create-card-links').value || '').split(/[\\n,]+/).map(v => v.trim()).filter(v => {
+                const safeLinks = (document.getElementById('create-card-links').value || '').split(/[\n,]+/).map(v => v.trim()).filter(v => {
                     try { const u = new URL(v); return u.protocol === 'https:' || u.protocol === 'http:'; } catch (_) { return false; }
                 }).slice(0, 8);
-                const otherGames = (document.getElementById('create-card-games').value || '').split(/[\\n,]+/).map(v => v.trim()).filter(Boolean).slice(0, 10);
+                const otherGames = (document.getElementById('create-card-games').value || '').split(/[\n,]+/).map(v => v.trim()).filter(Boolean).slice(0, 10);
                 const extraBio = (document.getElementById('create-card-bio').value || '').trim().slice(0, 280);
                 await db.collection('auracards').doc(uniqueDocId).set({
                     user: currentUser.uid,
